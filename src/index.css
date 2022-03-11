@@ -1,0 +1,152 @@
+@font-face {
+  font-family: Manrope;
+  src: local('Manrope'), url(./fonts/Manrope/Manrope-Regular.ttf) format('ttf');
+
+}
+
+@font-face {
+  font-family: Manrope-SemiBold;
+  src: url(./fonts/Manrope/Manrope-SemiBold.ttf); 
+}
+
+@font-face {
+  font-family: Manrope-Bold;
+  src: url(./fonts/Manrope/Manrope-Bold.ttf); 
+}
+
+
+body {
+  margin: 0;
+  font-family: Manrope, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.list-group-item {
+  border: none;
+  color: black;
+  background: none;
+
+}
+
+.btn-blue {
+  background-color: rgba(0, 0, 244, 1);
+  font-family: Manrope-Bold, sans-serif;
+
+  color: white;
+}
+
+.btn-green {
+  background-color: rgba(42, 175, 20, 1);
+  font-family: Manrope-Bold, sans-serif;
+
+  
+  color: white;
+}
+
+main {
+  background-image: url(images/background2.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+
+}
+
+.left-menu li {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+  font-size: 1.1rem;
+  
+}
+
+.left-menu li a {
+  text-decoration: none;
+  color: black;
+}
+
+.left-menu li hr {
+  background-color: rgba(196, 196, 196, 1);
+  width: 100%;
+}
+
+.left-menu li .active {
+  opacity: 0.5;
+}
+
+.left-menu li .active svg path {
+  stroke: #E5E5E5;
+}
+
+.form-label {
+  margin-bottom: 0.25rem;
+  color: black;
+}
+
+.btn {
+  margin-left: 0px !important;
+  border-radius: 8px;
+  border: 0;
+}
+
+.main-part h4, .main-part label {
+  font-family: Manrope-SemiBold, sans-serif;
+}
+
+.main-part .btn {
+  font-family: Manrope-Bold, sans-serif;
+  font-size: 0.9rem;
+}
+
+.nav-bottom {
+  padding-top: 1rem!important;
+  margin-top: 2.5rem!important;
+}
+
+.nav-bottom a {
+  text-decoration: none;
+  color: #000;
+}
+
+.rotate-arrow {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.search-results {
+  background-color: #F6F6F6;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #E5E5E5;
+}
+
+.search-results-title {
+  font-family: Manrope-Bold, sans-serif;
+}
+
+.invalid-input {
+  
+  background-color: #e99797;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #da3232;
+  color: white;
+}
+
+.pr-3 {
+  padding-right: 1rem!important;
+}
+
+.token-profile .show-value {
+  font-family: Manrope-Bold, sans-serif;
+  font-size: 1.2rem;
+
+}
+
+.token-profile h4 {
+  font-size: 1.8rem;
+  font-family: Manrope-Bold, sans-serif;
+}
+
+.token-profile-title  {
+  font-family: Manrope-Bold, sans-serif;
+}
