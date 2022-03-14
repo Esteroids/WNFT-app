@@ -5,8 +5,8 @@ function LeftNavItem(props){
     const { search } = useLocation();
     return (
 <li className="list-group-item lh-sm">
-    <NavLink to={props.itemLink + search} className="my-0  d-flex justify-content-between">
-        <h6>{props.itemLabel}</h6>
+    <NavLink to={props.item.route + search} className="my-0  d-flex justify-content-between">
+        <h6>{props.item.label}</h6>
         <ArrowIcon />
     </NavLink>
 </li>)

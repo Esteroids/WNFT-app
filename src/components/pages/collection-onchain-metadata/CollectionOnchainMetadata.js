@@ -20,13 +20,9 @@ function CollectionOnchainMetadata(props){
 
 
   const updateCollectionOnchainMetadata = (fieldName, fieldValue) => {
-    let appendCollectionOnchainMetadata = [];
-    appendCollectionOnchainMetadata[0] = props.contractDetails.tokenMetadataField[0].slice()
-    appendCollectionOnchainMetadata[1] = props.contractDetails.tokenMetadataField[1].slice()
-    
-    appendCollectionOnchainMetadata[0].push(fieldName)
-    appendCollectionOnchainMetadata[1].push(fieldValue)
-    props.setContractDetails({...props.contractDetails, collectionMetadataField: appendCollectionOnchainMetadata})
+    let newCollectionOnchainMetadata = Object.assign({}, props.contractDetails.collectionOnchainMetadata);
+    newCollectionOnchainMetadata[fieldName] = {'fieldName': fieldName, 'fieldValue': fieldValue};
+    props.setContractDetails({...props.contractDetails, collectionOnchainMetadata: newCollectionOnchainMetadata})
   }
 
   const callSetCollectionOnchainMetadata = () => {
@@ -38,7 +34,6 @@ function CollectionOnchainMetadata(props){
         setFieldValue('');
         setIsLoading(false);
         updateCollectionOnchainMetadata(fieldName, fieldValue);
-
       })
     }
   }
@@ -57,15 +52,15 @@ function CollectionOnchainMetadata(props){
         <table className="table">
           <thead>
             <tr>
-              <th scope="col">Name</th>
+              <th scope="col">Field Name</th>
               <th scope="col">Value</th>
             </tr>
           </thead>
           <tbody>
-            {props.contractDetails?.collectionMetadataField?props.contractDetails?.collectionMetadataField[0].map((fieldName, i) => {     
+            {props.contractDetails?.collectionOnchainMetadata && Object.keys(props.contractDetails.collectionOnchainMetadata).map((fieldName, i) => {     
   // Return the element. Also pass key     
-  return (<CollectionMetaDataRow key={"collection_metadata_row_" + i.toString()} indexField={i} collectionMetadataField={props.contractDetails.collectionMetadataField} />) 
-}):''}  
+  return (<CollectionMetaDataRow key={"collection_metadata_row_" + i.toString()} item={props.contractDetails.collectionOnchainMetadata[fieldName]} />) 
+})}  
           </tbody>
         </table>
       </div>

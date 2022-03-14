@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
 import WNFTABI from '../../utils/contracts/WNFTABI'
 import { getChainId, getRpcUrl, getWebSocketRpcUrl } from '../../utils/provider'
 import { ethers } from "ethers";
+import { refactorCollectionMetadata, refactorTokenMetadataDefenition } from "./WnftUtils"
 
 // use the given Provider, e.g in Mist, or instantiate a new websocket provider
 
@@ -18,6 +18,41 @@ const FIELD_SMART_CONTRACT_INDEX = 1;
 const FIELD_INTERFACE_INDEX = 2;
 
 const signatures = {'0x661f2816': 'str', '0x2421c19b': 'uint'}
+
+
+export const transferToken = async (contractAddress, transferTo, tokenId) => {
+
+  let isWallet = false;
+  let provider;
+  if (window.ethereum){
+    provider = new ethers.providers.Web3Provider( window.ethereum )
+    const { chainId } = await provider.getNetwork();
+    if (chainId!==getChainId(CONTRACT_NETWORK)){
+      provider = undefined;
+    }else{
+      isWallet = true;
+    }
+    
+  }
+
+  const signer = provider.getSigner(0);
+
+  if (signer !== null) {
+    try{
+
+      const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
+      const setTokenTransferFromTx = await WNFT_contract.transferFrom(signer.getAddress(), transferTo, tokenId)
+      setTokenTransferFromTx.wait()
+      console.log('set done')
+
+  
+    }catch(e) {
+      console.error('Error changing "transferToken" remote contract', e.name, ': ', e.message)
+
+    }
+
+  }
+}
 
 export const setWnftOffchainMetadata = async (contractAddress, wnftOffchainMetadataURI) => {
     let isWallet = false;
@@ -479,22 +514,17 @@ export const getTokenByTokenID = async (contractAddress, tokenId, withData, toke
       }
     }
 
-  
     const signer = provider.getSigner(0);
   
     if (signer !== null) {
       try{
         const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, provider);
-        //const tokenOwner = WNFT_contract.ownerOf(tokenId)
-        //tokenExistsData = {'owner': tokenOwner, 'id': tokenId}
-        //WNFT_contract.handleRevert = true;
+ 
         tokenExistsData = {'id': tokenId}
         const tokenExists = await WNFT_contract.tokenExists(tokenId)
         tokenExistsData['tokenExists'] = tokenExists;
         if (tokenExists){
           
-          // const tokenOwner = await WNFT_contract.ownerOf(tokenId);
-          // const tokenURI = await WNFT_contract.tokenURI(tokenId);
 
           let fetchedPromises = [];
           let fetchedOrder = [];
@@ -507,15 +537,32 @@ export const getTokenByTokenID = async (contractAddress, tokenId, withData, toke
           
           addFetchPromise('owner', WNFT_contract.ownerOf(tokenId));
           addFetchPromise('tokenURI', WNFT_contract.tokenURI(tokenId));
+
+          let tokenMetadataValues = {}
+          if(withData){
+            for (let i = 0;i<tokenMetadataFields[0].length;i++){
+              const fieldName = tokenMetadataFields[FIELD_NAME_INDEX][i];
+              const fieldInterface = tokenMetadataFields[FIELD_INTERFACE_INDEX][i];
+                if(signatures[fieldInterface]=='uint'){
+                  addFetchPromise((res) => { if (res) tokenMetadataValues[fieldName] = res }, WNFT_contract.tokenOnchainMetadataUint(tokenId, fieldName));
+                }else{
+                  addFetchPromise((res) => { if (res) tokenMetadataValues[fieldName] = res }, WNFT_contract.tokenOnchainMetadataString(tokenId, fieldName));
+
+                } 
+              
+            }
+            
+          }
         
-         
-          
           
           const results = await Promise.all(fetchedPromises);
   
           for (var i in results){
-            fetchedData[fetchedOrder[i]] = results[i];
+            if (typeof fetchedOrder[i]  === 'string') fetchedData[fetchedOrder[i]] = results[i];
+            else if (typeof fetchedOrder[i] === 'function') fetchedOrder[i](results[i]);
           }
+
+          if (withData) fetchedData.tokenMetadataValues = tokenMetadataValues;
 
           fetchedData.isTokenOwner = false;
           if (isWallet && signer.getAddress){
@@ -526,27 +573,6 @@ export const getTokenByTokenID = async (contractAddress, tokenId, withData, toke
               }catch{} 
             }
             
-          }
-
-          let tokenMetadataValues = {}
-          if(withData){
-            for (i = 0;i<tokenMetadataFields[0].length;i++){
-              const fieldName = tokenMetadataFields[FIELD_NAME_INDEX][i];
-              const fieldInterface = tokenMetadataFields[FIELD_INTERFACE_INDEX][i];
-              try{
-                if(signatures[fieldInterface]=='uint'){
-                  const fieldValue = await WNFT_contract.tokenOnchainMetadataUint(tokenId, fieldName);
-                  if (fieldValue) tokenMetadataValues[fieldName] = fieldValue
-                  
-                }else{
-                  const fieldValue = await WNFT_contract.tokenOnchainMetadataString(tokenId, fieldName);
-                  if (fieldValue) tokenMetadataValues[fieldName] = fieldValue
-                } 
-              }catch{}
-              
-
-            }
-            fetchedData.tokenMetadataValues = tokenMetadataValues
           }
 
           tokenExistsData = {...tokenExistsData, ...fetchedData}
@@ -626,28 +652,36 @@ export const getTokenByNthNum = async (contractAddress, nth_num) => {
 
 } 
 
-
-// export const getProvider = async () => {
-//   let provider;
-//   if (window.ethereum){
-//     provider = new ethers.providers.Web3Provider( window.ethereum )
-//     const { chainId } = await provider.getNetwork();
-//     if (chainId!==getChainId(CONTRACT_NETWORK)){
-//       provider = undefined;
-//     }
+export const transferWntOwnership = async (contractAddress, newOwner) => {
+  let isWallet = false;
+  let provider;
+  if (window.ethereum){
+    provider = new ethers.providers.Web3Provider( window.ethereum )
+    const { chainId } = await provider.getNetwork();
+    if (chainId!==getChainId(CONTRACT_NETWORK)){
+      provider = undefined;
+    }else{
+      isWallet = true;
+    }
     
-//   }
-//   //console.log('look for provider')
-//   if (provider===undefined){
-//     if (!USE_WEBSOCKETS){
-//       provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
-//     }else{
-//       provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
-      
-//     }
-//   }
-//   return provider;
-// }
+  }
+  const signer = provider.getSigner(0);
+  if (signer !== null) {
+    try{
+      const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
+
+      const transferOwnershipTx = await WNFT_contract.transferOwnership(newOwner)
+      await transferOwnershipTx.wait()
+      console.log('set done')
+
+    }catch(e) {
+      console.error('Error changing "transferWntOwnership" remote contract' + e.name + ': ' + e.message)
+
+    }
+
+  }
+}
+
 
 export const WnftContract = async (contractAddress) => {
   // const [contractDetails, setContractDetails] = useState({})
@@ -712,7 +746,7 @@ export const WnftContract = async (contractAddress) => {
         addFetchPromise('ensNodeId', WNFT_contract.ENSNodeID());
         addFetchPromise('ensResolver', WNFT_contract.ENSResolver());
         addFetchPromise('ensRegistar', WNFT_contract.ENSRegistar());
-        addFetchPromise('collectionMetadataField', WNFT_contract.getCollectionMetadataField());
+        addFetchPromise('collectionMetadataFieldRaw', WNFT_contract.getCollectionMetadataField());
         addFetchPromise('tokenMetadataField', WNFT_contract.getTokenMetadataField());
         addFetchPromise('ensContenthash', WNFT_contract.ensContenthash());
         
@@ -733,6 +767,8 @@ export const WnftContract = async (contractAddress) => {
           }catch{} 
         }
         
+        fetchedData.collectionOnchainMetadata = refactorCollectionMetadata(fetchedData.collectionMetadataFieldRaw)
+        fetchedData.tokenOnchainMetadataDefenitions = refactorTokenMetadataDefenition(fetchedData.tokenMetadataField)
         
         fetchedData.isWnftOwner = isWnftOwner;
         fetchedData.mintPrice = parseFloat((fetchedData.wnftPriceInUSDPOW8 / (10**8)));
@@ -748,7 +784,7 @@ export const WnftContract = async (contractAddress) => {
       
     }
 
-
+    console.log(contractDetails)
 
   return { contractDetails }
 }

@@ -1,14 +1,5 @@
-//import './App.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import { ethers } from "ethers";
+
 import { useState, useEffect } from "react";
-//import ContractDetails from './components/ContractDetails';
-
-import FetchContract from './components/FetchContract'
-import Loading from "./components/Loading";
-
-import { getChainId, getRpcUrl } from './utils/provider'
-import WNFTABI from './utils/contracts/WNFTABI'
 import { Route, Routes, useSearchParams, Outlet } from "react-router-dom";
 
 import Header from './components/header/Header';
@@ -19,8 +10,11 @@ import GeneralInformation from './components/pages/general-information/GeneralIn
 import CollectionOnchainMetadata from "./components/pages/collection-onchain-metadata/CollectionOnchainMetadata";
 import TokenOnchainMetadata from "./components/pages/token-onchain-metadata/TokenOnchainMetadata";
 import EnsAction from "./components/pages/ens-action/EnsAction";
-import MintingMechanismAndMintAToken from "./components/pages/minting/MintingMechanismAndMintAToken";
+import MintingMechanism from "./components/pages/minting-mechanism/MintingMechnism"
+//import MintingMechanismAndMintAToken from "./components/pages/minting/MintingMechanismAndMintAToken";
+
 import BrowseTokens from "./components/pages/browse-tokens/BrowseTokens";
+import MintAToken from "./components/pages/mint-token/MintAToken";
 import TokenProfile from "./components/pages/token-profile/TokenProfile";
 import {WnftContract} from "./components/data/WnftContract";
 
@@ -35,26 +29,26 @@ reusing "Minting" at 0x7168D21B1311d5f0d835d5Be901a06614619d9Bc
 Basic minting deployed
 ----------------------------------------------------
 ----------------------------------------------------
-deploying "WNFT" (tx: 0xb61ee780ecf315fcf7e2ae6c525f9c9b1fd90a01a569ff205338adc20eb5450b)...: deployed at 0xD17D95B20ef169459f55C5102463BC052340C463 with 3896148 gas
+reusing "WNFT" at 0xD17D95B20ef169459f55C5102463BC052340C463
 Deployed WNFT
 ----------------------------------------------------
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Please run `npx hardhat console` to interact with the deployed smart contracts!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ----------------------------------------------------
-deploying "onchainTokenDataSize" (tx: 0xca228d4c2740eae734d26bd7aaee884d2f217692785a8f88f8726994ce319c1f)...: deployed at 0x3c02f6c0FCB52E3b830094c864b8d2bF0df9169E with 336024 gas
-deploying "onchainTokenDataString" (tx: 0xa2c2a5c10b3dd0484e1cdf6fabf0d13d832a43e0cb56d3a34a028bfd1a79a0c1)...: deployed at 0xB745B651294f3fA525d902DE24a68BA67a478d58 with 259931 gas
-deploying "onchainTokenDataUint" (tx: 0xe60e9f2b1f5c1006b99d3571e62fdcc71420c0cd41d08c17e55f3f5c051b7a56)...: deployed at 0x1A320bF78bbeF9c7caDb50218224889a4fa4810c with 168364 ga
+reusing "onchainTokenDataSize" at 0x3c02f6c0FCB52E3b830094c864b8d2bF0df9169E
+deploying "onchainTokenDataString" (tx: 0x27a3ee69e1d2fd8756c61d8b1d77005a5684f328c62793ac3e953253b49c8af1)...: deployed at 0xC166F8f7686D8B41f82B0a638d551A0932E4eab0 with 287171 gas
+deploying "onchainTokenDataUint" (tx: 0x0dd2b5aff63d4303c9da3ba34b51aba3fc5295a2803f2cb28bce105c03586025)...: deployed at 0x6BCAe7da6d069546e19ef9a81b669f03c8d86994 with 172912 gas
 */
 
 
 function ContractPageLayout(){
   return (
 <>
-  <div className="col-md-5 col-lg-4">
+  <div className="col-md-4 col-lg-3">
       <LeftNavMenu />
   </div>
-  <div className="col-md-7 col-lg-8 main-part">
+  <div className="col-md-8 col-lg-9 main-part">
     <Outlet />
     <BottomNav />
   </div>
@@ -71,7 +65,7 @@ function App(){
 
   const contractURLAddress = searchParams.get('contract')
 
-  const [contractAddress, setContractAddress] = useState(contractURLAddress)
+  const [contractAddress, setContractAddress] = useState(contractURLAddress||"")
   const [contractDetails, setContractDetails] = useState({})
   const [error, setError] = useState("")
   const [isContractLoading, setIsContractLoading] = useState(false)
@@ -105,8 +99,10 @@ function App(){
               <Route path="/collection-onchain-metadata"  element={<CollectionOnchainMetadata contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded}  />} />
               <Route path="/token-onchain-metadata"  element={<TokenOnchainMetadata contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />} />
               <Route path="/ens-action"  element={<EnsAction contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />}  />
+              <Route path="/minting-mechanism"  element={<MintingMechanism contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />}  />
               <Route path="/browse-tokens"  element={<BrowseTokens contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />} />
-              <Route path="/minting"  element={<MintingMechanismAndMintAToken contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />} />
+              <Route path="/mint-token"  element={<MintAToken contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />} />
+
 
         </Route>
         <Route path="/token-profile"  element={<TokenProfile contractDetails={contractDetails} isContractLoaded={isContractLoaded} />} />
@@ -117,98 +113,5 @@ function App(){
 </main>
 )
 }
-
-
-// function App() {
-
-//   const [showLoading, setShowLoading] = useState(false);
-//   const [contractLoaded, setContractLoaded] = useState(false);
-//   const [contractDetails, setContractDetails] = useState({});
-
-
-//   let isWnftOwner = false;
-
-//   const fetchContract = async (contractAddress) => {
-//     setShowLoading(true);
-//     let provider;
-//     if (window.ethereum){
-//       provider = new ethers.providers.Web3Provider( window.ethereum )
-//       const { chainId } = await provider.getNetwork();
-//       if (chainId!==getChainId(CONTRACT_NETWORK)){
-//         provider = undefined;
-//       }
-      
-//     }
-//     if (provider===undefined){
-//       provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
-//     }
-  
-  
-//     const signer = provider.getSigner(0);
-  
-//     if (signer !== null) {
-  
-//       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, provider);
-//       const wnftOwner = await WNFT_contract.owner();
-//       const symbol = await WNFT_contract.symbol();
-//       const name = await WNFT_contract.name();
-//       const mintingContract = await WNFT_contract.mintingContract();
-//       console.log(mintingContract)
-//       const mintPrice = parseInt((await WNFT_contract._wnftPriceInUSDPOW8() / (10**8)));
-//       console.log(mintPrice)
-//       const wnftOffchainMetadata = await WNFT_contract.wnftUri();
-//       console.log(wnftOffchainMetadata);
-//       const ensNodeId = await WNFT_contract.ENSNode();
-//       console.log(ensNodeId);
-//       const ensResolver = await WNFT_contract.ENSResolver();
-//       console.log(ensResolver);
-
-//       isWnftOwner = signer===wnftOwner
-//       console.log('contract owner ', isWnftOwner)
-
-//       setContractDetails({...contractDetails, 
-//         wnftOwner: wnftOwner, 
-//         name: name, 
-//         symbol: symbol, 
-//         mintingContract: mintingContract, 
-//         mintPrice: mintPrice, 
-//         wnftOffchainMetadata: wnftOffchainMetadata,
-//         ensNodeId: ensNodeId,
-//         ensResolver: ensResolver
-//         })
-//       console.log('fetched contract', name, symbol);
-//       setShowLoading(false);
-//       setContractLoaded(true);
-//     }
-//   }
-  
-
-
-//   return (
-//     <BrowserRouter>
-//       <div className="container-contact100">
-//         <div className="wrap-contact100">
-//         <div className="container">
-//       <div className="py-5 text-center">
-//         <h2>WNFT Manager</h2>
-//       </div>
-//       <div className="row">
-        
-//         <div className="col-md-8 order-md-1">
-          
-//           <FetchContract fetchContract={fetchContract} />
-//           {showLoading === true && <Loading />}
-//           { contractLoaded && (<ContractDetails contractDetails={contractDetails} isWnftOwner={isWnftOwner} />) } 
-    
-//         </div>
-//       </div>
-
-//     </div>
-//         </div>
-//       </div>
-//       <div id="dropDownSelect1"></div>
-//     </BrowserRouter>
-//   );
-// }
 
 export default App;

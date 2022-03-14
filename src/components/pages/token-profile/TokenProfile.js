@@ -1,18 +1,30 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getTokenByTokenID, setTokenURI } from "../../data/WnftContract";
+import { getTokenByTokenID, setTokenURI, transferToken } from "../../data/WnftContract";
 import BottomNav from "../../bottom-nav/BottomNav";
 import GenericFieldSet from '../../generics/GenericFieldSet';
 import TokenOnchainMetadataValues from "./TokenOnchainMetadataValues"
-
-
+import {ethAddressValidate} from "../../../utils/validators"
 
 
 function TokenProfile(props){
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [tokenDetails, setTokenDetails] = useState({});
-  //const [tokenURIValue, setTokenURIValue] = useState(tokenDetails?.tokenURI||'');
+
+  const tokenId = searchParams.get('token-id')
+
+  useEffect(() => {
+    if(tokenId && props.contractDetails?.contractAddress){
+      const withData = true;
+      getTokenByTokenID(props.contractDetails?.contractAddress, tokenId, withData, props.contractDetails.tokenMetadataField).then((resp)=>{
+        setTokenDetails(resp)
+      })
+    }
+  }, [tokenId, props.contractDetails])
+
+  const notTokenOwner = !tokenDetails?.isTokenOwner;
+
 
   const callSetTokenURI = (tokenURIValue) => {
     let promise = new Promise(function (resolve, reject) {
@@ -23,24 +35,17 @@ function TokenProfile(props){
     return promise;
   }
 
-  const [transferToValue, setTransferToValue] = useState('');
-
-
-  const tokenId = searchParams.get('token-id')
-
-  const transferToValueChange = (e) => setTransferToValue(e.target.value)
-
-
-  const notTokenOwner = !tokenDetails?.isTokenOwner;
-    
-  useEffect(() => {
-    if(tokenId && props.contractDetails?.contractAddress){
-      const withData = true;
-      getTokenByTokenID(props.contractDetails?.contractAddress, tokenId, withData, props.contractDetails.tokenMetadataField).then((resp)=>{
-        setTokenDetails(resp)
+  const callTransferTokenTo = (transferTokenTo) => {
+    let promise = new Promise(function (resolve, reject) {
+      transferToken(props?.contractDetails?.contractAddress, transferTokenTo, tokenDetails.id)
+      .then(() => {
+        setTokenDetails({...tokenDetails, owner: transferTokenTo, isTokenOwner: false});
+        resolve(true);
       })
-    }
-  }, [tokenId, props.contractDetails])
+      .catch(() => reject('error'))
+    });
+    return promise;
+  }
 
   
     return (
@@ -74,20 +79,16 @@ function TokenProfile(props){
                 <label htmlFor="website-cid" className="form-label">Owner</label>
                 <div className="show-value">{tokenDetails?.owner||''}</div>
             </div>
-            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Content" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} />
+            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Offchain metadata" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} />
 
-            <div className="col-7  my-5">
-                <div className="input-group">
-                <input type="text" disabled={notTokenOwner ? 'disabled' : null} className="form-control shadow-lg rounded" name="transfer-to" id="transfer-to" value={transferToValue} onChange={transferToValueChange}  />
-                <button type="submit" disabled={notTokenOwner ? 'disabled' : null} className="btn btn-secondary " >TRANSFER</button>
-                </div>
-                
-            </div>
+            <GenericFieldSet mainClass="col-7  my-5" key="transfer-to-key" buttonLabel="TRANSFER" genericFieldLabel="" emptyLabel={true} genericFieldID="transfer-to" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callTransferTokenTo} initFieldValue="" validator={ethAddressValidate} />
+
+           
         </div>
         <h4>Onchain metadata</h4>
-        {props.contractDetails?.tokenMetadataField?props.contractDetails?.tokenMetadataField[0].map((_, i) => {       
-  return (<TokenOnchainMetadataValues key={"token_onchain_values_" + i.toString()} indexField={i} tokenMetadataField={props.contractDetails.tokenMetadataField} notTokenOwner={notTokenOwner} contractDetails={props.contractDetails} tokenId={tokenDetails?.id} />) 
-}):''}
+        {props.contractDetails?.tokenOnchainMetadataDefenitions && Object.keys(props.contractDetails.tokenOnchainMetadataDefenitions).map((fieldName, i) => {       
+  return (<TokenOnchainMetadataValues key={"token_onchain_values_" + i.toString()} indexField={i} item={props.contractDetails.tokenOnchainMetadataDefenitions[fieldName]} notTokenOwner={notTokenOwner} contractDetails={props.contractDetails} tokenId={tokenDetails?.id} tokenDetails={tokenDetails} />) 
+})}
     </div>
     <BottomNav />
   </>)

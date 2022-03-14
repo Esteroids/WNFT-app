@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ethers } from "ethers";
 import ReactTooltip from 'react-tooltip';
-import {setWnftOffchainMetadata} from "../../data/WnftContract"
+import {setWnftOffchainMetadata, transferWntOwnership} from "../../data/WnftContract"
 import GenericFieldSet from '../../generics/GenericFieldSet';
+import { ethAddressValidate } from "../../../utils/validators";
 
 const loading_gif = require('../../../images/Loading_Animation.gif');
 
@@ -14,6 +15,10 @@ function GeneralInformation(props){
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [contractAddressValue, setContractAddressValue] = useState(props.contractAddress); 
+
+  const notOwner = (!props.contractDetails?.isWnftOwner);
+
+  const notOwnerAndNotLogin = (notOwner && 'Only the owner may modify this data.') || ''
  
 
   const callFetchContract = () => {
@@ -35,13 +40,20 @@ function GeneralInformation(props){
     });
     return promise;
   }
+  
+  const callTransferWnft = (transferTo) => {
+    let promise = new Promise(function (resolve, reject) {
+      transferWntOwnership(props?.contractDetails?.contractAddress, transferTo)
+      .then(() => {
+        props.setContractDetails({...props.contractDetails, wnftOwner: transferTo, isWnftOwner: false});
+        resolve(true);
+      })
+      .catch(() => reject('error'))
+    });
+    return promise;
+  }
 
  
-
-
-  const notOwner = (!props.contractDetails?.isWnftOwner);
-
-  const notOwnerAndNotLogin = (notOwner && 'Only the owner may modify this data.') || ''
 
   return (
 <>
@@ -52,7 +64,7 @@ function GeneralInformation(props){
       <label htmlFor="contract-address" className="form-label">Contract Address</label>
       <div className="input-group">
         
-        <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} value={contractAddressValue} />
+        <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
         <button  type="submit" className="btn btn-blue"  onClick={callFetchContract}>FETCH</button>
       </div>
       { props.isContractLoading && (<img src={loading_gif} />)}
@@ -69,8 +81,17 @@ function GeneralInformation(props){
         {props.contractDetails?.symbol||''} 
       </div>
     </div>
+
+    <div className="col-12  my-3">
+      <label htmlFor="contract-symbol" className="form-label">Owner</label>
+      <div className="input-group">
+        {props.contractDetails?.wnftOwner||''} 
+      </div>
+    </div>
    
-    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="WNFT offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} />
+    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="Offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} />
+
+    <GenericFieldSet key="wnft-transfer-key" genericFieldLabel="Transfer" buttonLabel="TRANSFER" genericFieldID="wnft-transfer" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callTransferWnft} initFieldValue="" validator={ethAddressValidate} />
 
   </div>
 </>)

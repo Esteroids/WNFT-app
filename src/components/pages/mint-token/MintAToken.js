@@ -1,5 +1,9 @@
 import { useState } from "react";
 import {mintToken} from "../../data/WnftContract"
+import { Link, useSearchParams } from "react-router-dom";
+import ReactTooltip from 'react-tooltip';
+const loading_gif = require('../../../images/Loading_Animation.gif');
+
 
 function MintAToken(props){
 
@@ -7,14 +11,25 @@ function MintAToken(props){
     const [withCID, setWithCID] = useState(true); 
     const [tokenIDToMint, setTokenIDToMint] = useState(''); 
     const [initTokenCID, setInitTokenCID] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false); 
+    const [isMinted, setIsMinted] = useState(false); 
+
+    let [searchParams, setSearchParams] = useSearchParams();
 
 
     const tokenIDToMintChange = (e) => setTokenIDToMint(e.target.value)
     const initTokenCIDChange = (e) => setInitTokenCID(e.target.value)
 
     const callMintToken = () => {
+        setIsLoading(true);
         mintToken(props.contractDetails.contractAddress, tokenIDToMint, initTokenCID, withCID, props.contractDetails.mintPrice )
-        .then(() => {setTokenIDToMint('');setInitTokenCID('')})
+        .then(() => {
+            setTokenIDToMint('');
+            setInitTokenCID('');
+            searchParams.set('token-id', tokenIDToMint);
+            setIsLoading(false);
+            setIsMinted(true);
+        })
     }
 
 
@@ -25,6 +40,7 @@ function MintAToken(props){
 
     return (
 <>
+  <ReactTooltip />
     <h4 className="mb-3">Mint a Token</h4>
     
     <div className='py-3'>
@@ -52,6 +68,10 @@ function MintAToken(props){
                 <input type="text" className="form-control shadow-lg rounded" name="init-cid-to-token" id="init-cid-to-token" value={initTokenCID} disabled={notIsContractLoaded ? 'disabled' : null} onChange={initTokenCIDChange} />
             </div>
         </div>) }
+        { isLoading && (<div className="col-12 d-flex"><img src={loading_gif} /></div>)}
+        {isMinted && (<div className="search-results my-3 p-3">
+            <div className="mt-2">Minted Successfully - <Link to={{ pathname: '/token-profile', search: searchParams.toString()}}>Token Profile</Link></div>
+        </div>)}
     </div>
 </>)
 }

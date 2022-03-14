@@ -6,13 +6,14 @@ function LeftNavMenu(){
     return (
 <nav>
     <ul className="list-group mb-3 left-menu mr-3">    
-        <LeftNavItem itemLabel="General Information" itemLink={PagesInfo['general-information'].route} />
-        <LeftNavItem itemLabel="Collection Onchain Metadata" itemLink={PagesInfo['collection-onchain-metadata'].route} />
-        <LeftNavItem itemLabel="Token Onchain Metadata" itemLink={PagesInfo['token-onchain-metadata'].route} />
-        <LeftNavItem itemLabel="ENS Action" itemLink={PagesInfo['ens-action'].route} />
+        <LeftNavItem  item={PagesInfo['general-information']} />
+        <LeftNavItem item={PagesInfo['collection-onchain-metadata']} />
+        <LeftNavItem item={PagesInfo['token-onchain-metadata']} />
+        <LeftNavItem item={PagesInfo['ens-action']} />
+        <LeftNavItem item={PagesInfo['minting-mechanism']} />
         <LeftNavSeperator />
-        <LeftNavItem itemLabel="Browse Tokens" itemLink={PagesInfo['browse-tokens'].route} />
-        <LeftNavItem itemLabel="Minting mechanism & Mint a token" itemLink={PagesInfo['minting'].route} />            
+        <LeftNavItem item={PagesInfo['browse-tokens']} />
+        <LeftNavItem item={PagesInfo['mint-token']} />            
     </ul>
 </nav>)
 }

@@ -18,20 +18,26 @@ const PagesInfo = {
     },
     'ens-action': {
         route: 'ens-action',
-        next: 'browse-tokens',
+        next: 'minting-mechanism',
         prev: 'token-onchain-metadata',
         label: 'ENS Action'
     },
+    'minting-mechanism': {
+        route: 'minting-mechanism',
+        next: 'browse-tokens',
+        prev: 'ens-action',
+        label: 'Minting Mechanism '
+    },
     'browse-tokens': {
         route: 'browse-tokens',
-        next: 'minting',
+        next: 'mint-token',
         prev: 'ens-action',
         label: 'Browse Tokens'
     },
-    'minting': {
-        route: 'minting',
+    'mint-token': {
+        route: 'mint-token',
         prev: 'browse-tokens',
-        label: 'Minting mechanism & Mint a token'
+        label: 'Mint a Token'
     },
     'token-profile': {
         route: 'token-profile',

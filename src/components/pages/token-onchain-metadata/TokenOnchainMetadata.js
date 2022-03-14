@@ -20,14 +20,13 @@ function TokenOnchainMetadata(props){
   const fieldSmartContractAddressChange = (e) => setFieldSmartContractAddress(e.target.value);
 
   const updateTokenOnchainMetadataField = (fieldName, fieldSmartContractInterface, fieldSmartContractAddress) => {
-    let appendTokenMetadataField = [];
-    appendTokenMetadataField[0] = props.contractDetails.tokenMetadataField[0].slice()
-    appendTokenMetadataField[1] = props.contractDetails.tokenMetadataField[1].slice()
-    appendTokenMetadataField[2] = props.contractDetails.tokenMetadataField[2].slice()
-    appendTokenMetadataField[0].push(fieldName)
-    appendTokenMetadataField[1].push(fieldSmartContractAddress)
-    appendTokenMetadataField[2].push(fieldSmartContractInterface)
-    props.setContractDetails({...props.contractDetails, tokenMetadataField: appendTokenMetadataField})
+   
+    let newTokenOnchainMetadataDefenitions = Object.assign({}, props.contractDetails.tokenOnchainMetadataDefenitions);
+    newTokenOnchainMetadataDefenitions[fieldName] = {
+      'fieldName': fieldName, 
+      'smartContractAddress': fieldSmartContractAddress, 
+      'smartContractInterface': fieldSmartContractInterface};
+    props.setContractDetails({...props.contractDetails, tokenOnchainMetadataDefenitions: newTokenOnchainMetadataDefenitions})
   }
 
   const callSetTokenOnchainMetadataField = () => {
@@ -58,16 +57,16 @@ function TokenOnchainMetadata(props){
         <table className="table">
           <thead>
             <tr>
-              <th scope="col">Name</th>
+              <th scope="col">Field Name</th>
               <th scope="col">Smart Contract</th>
               <th scope="col">Interface</th>
             </tr>
           </thead>
           <tbody>
-          {props.contractDetails?.tokenMetadataField?props.contractDetails?.tokenMetadataField[0].map((fieldName, i) => {     
+          {props.contractDetails?.tokenOnchainMetadataDefenitions && Object.keys(props.contractDetails.tokenOnchainMetadataDefenitions).map((fieldName, i) => {     
   // Return the element. Also pass key     
-  return (<TokenOnchainMetadataRow key={"token_fields_metadata_row_" + i.toString()} indexField={i} tokenMetadataField={props.contractDetails.tokenMetadataField} />) 
-}):''}  
+  return (<TokenOnchainMetadataRow key={"token_fields_metadata_row_" + i.toString()} indexField={i} item={props.contractDetails.tokenOnchainMetadataDefenitions[fieldName]} />) 
+})}  
           </tbody>
         </table>
       </div>

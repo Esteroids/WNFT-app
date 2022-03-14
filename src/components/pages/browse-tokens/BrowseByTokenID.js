@@ -3,6 +3,7 @@ import BrowseByTokenIDResult from "./BrowseByTokenIDResult"
 import {getTokenByTokenID} from "../../data/WnftContract"
 import {intValidate} from "../../../utils/validators"
 import GenericFieldSetError from "../../generics/GenericFieldSetError";
+
 const loading_gif = require('../../../images/Loading_Animation.gif');
 
 
@@ -35,7 +36,7 @@ function BrowseByTokenID(props){
     <button type="submit" className="btn btn-blue" onClick={callGetTokenByID} disabled={notIsContractLoaded ? 'disabled' : null}>SHOW</button>
   </div>
   {!isError && (tokenSearchResults?.tokenExists !== undefined) && (<BrowseByTokenIDResult tokenSearchResults={tokenSearchResults} key="browse_by_token_id_results" />) }
-  {isError &&  ((<GenericFieldSetError  key="browse_by_token_id_input_error" />)) }
+  {isError &&  (<GenericFieldSetError  key="browse_by_token_id_input_error" />) }
   { isLoading && (<img src={loading_gif} />)}
 
 </div>)

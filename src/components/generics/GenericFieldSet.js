@@ -11,7 +11,12 @@ function GenericFieldSet(props){
         setGenericFieldValue(props.initFieldValue || '')
     }, [props.initFieldValue])
 
-    const genericFieldValueChange = (e) => {isError && setIsError('');setGenericFieldValue(e.target.value)}
+    const genericFieldValueChange = (e) => {
+      isError && setIsError('');
+      setGenericFieldValue(e.target.value);
+    }
+
+    const genericFieldKeyPress = (e) => { e.key === 'Enter' && callSetGenericFieldValue();}
 
     const callSetGenericFieldValue = async () => {
         if (props.validator){
@@ -22,20 +27,20 @@ function GenericFieldSet(props){
             return;
           }
         }
-        console.log('isLoading1', isLoading)
         setIsLoading(true);
-        console.log('isLoading2', isLoading)
-        props.callSet(genericFieldValue).then(() => {setIsLoading(false);console.log('isLoading3', isLoading)}).catch(() => {setIsLoading(false);console.log('isLoading4', isLoading)})
+        props.callSet(genericFieldValue).then(() => {setIsLoading(false);}).catch(() => {setIsLoading(false);})
     }
 
+    const buttonLabel = props.buttonLabel || 'SET'
 
+    const fieldLabelElement = !props.emptyLabel && (<label htmlFor={props.genericFieldID} className="form-label">{props.genericFieldLabel}</label>)
     
     return (    
 <div className={props.mainClass || "col-12  my-3"}>
-  <label htmlFor={props.genericFieldID} className="form-label">{props.genericFieldLabel}</label>
+  {fieldLabelElement}
   <div className="input-group">
-    <input type="text" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="form-control shadow-lg rounded" name={props.genericFieldID} id={props.genericFieldID}  onChange={genericFieldValueChange} value={genericFieldValue} />
-    <button type="submit" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="btn btn-secondary" onClick={callSetGenericFieldValue}>SET</button>
+    <input type="text" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="form-control shadow-lg rounded" name={props.genericFieldID} id={props.genericFieldID}  onChange={genericFieldValueChange} onKeyPress={genericFieldKeyPress} value={genericFieldValue} />
+    <button type="submit" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="btn btn-secondary" onClick={callSetGenericFieldValue}>{buttonLabel}</button>
   </div>
   { isLoading && (<img src={loading_gif} />)}
   {isError&& (<GenericFieldSetError key={props.genericFieldID + '_input_error'} />)}
