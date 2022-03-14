@@ -74,3 +74,5 @@ The code in this repository is published under MIT license. The content in this 
 ## Credits and references
 
 WNFT was created by [Tomer Leicht](https://github.com/tomlightning) and [Eyal Ron](https://github.com/eyalron33).
+
+The loading animation was craeted by JCRules, and is used under CC BY-SA 3.0 license, via Wikimedia Commons.
