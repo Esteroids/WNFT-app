@@ -16,12 +16,16 @@ function BrowseByNthToken(props){
   const [isLoading, setIsLoading] = useState(false); 
 
   const callGetNthToken = () => {
-    if (intValidate(nthTokenValue)) {
+    const validator = intValidate(nthTokenValue)
+    if (validator.valid) {
       setIsLoading(true);
       getTokenByNthNum(props.contractDetails.contractAddress, nthTokenValue).then((resp) => { setTokenSearchResults( resp );setIsLoading(false);})
     }
-    else setIsError('error')
+    else setIsError(validator.msg)
   }
+
+  const getNthTokenKeyDown = (e) => { e.key === 'Enter' && callGetNthToken();}
+
 
   const tokenNumChange = (e) => {setIsError('');setNthTokenValue(e.target.value)}
 
@@ -32,11 +36,11 @@ function BrowseByNthToken(props){
 <div className="col-12  my-3">
   <label htmlFor="browse-nth-token" className="form-label">Token number</label>
   <div className="input-group">
-    <input type="text" className="form-control shadow-lg rounded" name="browse-nth-token" id="browse-nth-token" onChange={tokenNumChange} value={nthTokenValue} disabled={notIsContractLoaded ? 'disabled' : null}  />
+    <input type="text" className="form-control shadow-lg rounded" name="browse-nth-token" id="browse-nth-token" onChange={tokenNumChange} onKeyDown={getNthTokenKeyDown} value={nthTokenValue} disabled={notIsContractLoaded ? 'disabled' : null}  />
     <button type="submit" className="btn btn-blue" onClick={callGetNthToken} disabled={notIsContractLoaded ? 'disabled' : null}>SHOW</button>
   </div>
   {!isError && (tokenSearchResults?.tokenExists !== undefined) && (<BrowseByTokenIDResult tokenSearchResults={tokenSearchResults} key="browse_nth_token_results" />) }
-  {isError &&  ((<GenericFieldSetError key="browse_nth_token_input_error" />)) }
+  {isError &&  ((<GenericFieldSetError key="browse_nth_token_input_error" errorMsg={isError} />)) }
   { isLoading && (<img src={loading_gif} />)}
 
 </div>)

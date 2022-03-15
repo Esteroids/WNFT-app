@@ -20,25 +20,21 @@ import {WnftContract} from "./components/data/WnftContract";
 
 
 /*
-reusing "MockV3Aggregator" at 0xB3517658996C71D4d236df6B25aae439BAb7A9f8
-----------------------------------------------------
+Network goerli doesnt have ethUsdPriceFeed deploying mock
+reusing "MockV3Aggregator" at 0xc9BBaB4B58f1160ADC353925404af5dc354B6d7E
+
 Mocks Deployed!
-----------------------------------------------------
-----------------------------------------------------
-reusing "Minting" at 0x7168D21B1311d5f0d835d5Be901a06614619d9Bc
+
+
+reusing "Minting" at 0x6c936e4bE522f75911a69E2dA9c042099cbB7dfb
 Basic minting deployed
-----------------------------------------------------
-----------------------------------------------------
-reusing "WNFT" at 0xD17D95B20ef169459f55C5102463BC052340C463
+
+deploying "WNFT" deployed at 0x82aE8A806b97c3d88561bB2468e76C9B82c18008 with 3895944 gas
 Deployed WNFT
-----------------------------------------------------
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-Please run `npx hardhat console` to interact with the deployed smart contracts!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-----------------------------------------------------
-reusing "onchainTokenDataSize" at 0x3c02f6c0FCB52E3b830094c864b8d2bF0df9169E
-deploying "onchainTokenDataString" (tx: 0x27a3ee69e1d2fd8756c61d8b1d77005a5684f328c62793ac3e953253b49c8af1)...: deployed at 0xC166F8f7686D8B41f82B0a638d551A0932E4eab0 with 287171 gas
-deploying "onchainTokenDataUint" (tx: 0x0dd2b5aff63d4303c9da3ba34b51aba3fc5295a2803f2cb28bce105c03586025)...: deployed at 0x6BCAe7da6d069546e19ef9a81b669f03c8d86994 with 172912 gas
+
+deploying "onchainTokenDataSize" deployed at 0xbCcB02287F3E69ac8Cc3254956F636ca45F53E31 with 336024 gas
+deploying "onchainTokenDataString" deployed at 0xE33Ed1D861289f801b2d118B06eF1D9f8a3bfEc5 with 287171 gas
+deploying "onchainTokenDataUint" deployed at 0xC6A3C3627B5A9E7F7910b3acb303FE1E40996d61 with 172912 gas
 */
 
 
@@ -65,7 +61,7 @@ function App(){
 
   const contractURLAddress = searchParams.get('contract')
 
-  const [contractAddress, setContractAddress] = useState(contractURLAddress||"")
+  const [contractAddress, setContractAddress] = useState(contractURLAddress)
   const [contractDetails, setContractDetails] = useState({})
   const [error, setError] = useState("")
   const [isContractLoading, setIsContractLoading] = useState(false)
@@ -75,6 +71,7 @@ function App(){
 
   useEffect(() => {
     if(contractAddress){
+      
       setIsContractLoading(true)
       WnftContract(contractAddress).then((resp)=>{
         setIsContractLoading(false);

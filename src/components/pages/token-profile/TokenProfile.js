@@ -9,7 +9,7 @@ import {ethAddressValidate} from "../../../utils/validators"
 
 function TokenProfile(props){
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
   const [tokenDetails, setTokenDetails] = useState({});
 
   const tokenId = searchParams.get('token-id')
@@ -17,7 +17,7 @@ function TokenProfile(props){
   useEffect(() => {
     if(tokenId && props.contractDetails?.contractAddress){
       const withData = true;
-      getTokenByTokenID(props.contractDetails?.contractAddress, tokenId, withData, props.contractDetails.tokenMetadataField).then((resp)=>{
+      getTokenByTokenID(props.contractDetails?.contractAddress, tokenId, withData, props.contractDetails.tokenOnchainMetadataDefenitions).then((resp)=>{
         setTokenDetails(resp)
       })
     }

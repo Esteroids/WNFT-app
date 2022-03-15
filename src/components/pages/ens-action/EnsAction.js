@@ -14,23 +14,21 @@ function EnsAction(props){
 
   const callSetEnsNode = (ensNode) => {
     let promise = new Promise(function (resolve, reject) {
-
-    setEnsNode(props?.contractDetails?.contractAddress, ensNode)
-    .then(() => {props.setContractDetails({...props.contractDetails, ensNodeId: ensNode});resolve(true);})
-    .catch(() => reject('error'))
-  });
+      setEnsNode(props?.contractDetails?.contractAddress, ensNode)
+      .then(() => {props.setContractDetails({...props.contractDetails, ensNodeId: ensNode});resolve(true);})
+      .catch(() => reject('error'))
+    });
   return promise;
 
   }
 
   const callSetEnsContenthash = (ensContenthash) => {
     let promise = new Promise(function (resolve, reject) {
-
-    setEnsContenthash(props?.contractDetails?.contractAddress, ensContenthash)
-    .then(() => {props.setContractDetails({...props.contractDetails, ensContenthash: ensContenthash});resolve(true);})
-    .catch(() => reject('error'))
-  });
-  return promise;
+      setEnsContenthash(props?.contractDetails?.contractAddress, ensContenthash)
+      .then(() => {props.setContractDetails({...props.contractDetails, ensContenthash: ensContenthash});resolve(true);})
+      .catch(() => reject('error'))
+    });
+    return promise;
   }
 
   const callSetEnsResolver = (ensResolver) => {

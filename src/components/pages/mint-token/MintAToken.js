@@ -2,6 +2,9 @@ import { useState } from "react";
 import {mintToken} from "../../data/WnftContract"
 import { Link, useSearchParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
+import { intValidate } from "../../../utils/validators";
+import GenericFieldSetError from "../../generics/GenericFieldSetError";
+
 const loading_gif = require('../../../images/Loading_Animation.gif');
 
 
@@ -13,30 +16,40 @@ function MintAToken(props){
     const [initTokenCID, setInitTokenCID] = useState(''); 
     const [isLoading, setIsLoading] = useState(false); 
     const [isMinted, setIsMinted] = useState(false); 
+    const [isError, setIsError] = useState(''); 
+
 
     let [searchParams, setSearchParams] = useSearchParams();
 
+    const notIsContractLoaded = !props.isContractLoaded
 
-    const tokenIDToMintChange = (e) => setTokenIDToMint(e.target.value)
-    const initTokenCIDChange = (e) => setInitTokenCID(e.target.value)
+    const tokenIDToMintChange = (e) => {setTokenIDToMint(e.target.value);setIsError('')}
+    const initTokenCIDChange = (e) => {setInitTokenCID(e.target.value);setIsError('')}
 
     const callMintToken = () => {
-        setIsLoading(true);
-        mintToken(props.contractDetails.contractAddress, tokenIDToMint, initTokenCID, withCID, props.contractDetails.mintPrice )
-        .then(() => {
-            setTokenIDToMint('');
-            setInitTokenCID('');
-            searchParams.set('token-id', tokenIDToMint);
-            setIsLoading(false);
-            setIsMinted(true);
-        })
+        setIsMinted(false);
+        const validator = intValidate(tokenIDToMint)
+        if (validator.valid){
+            setIsLoading(true);
+            mintToken(props.contractDetails.contractAddress, tokenIDToMint, initTokenCID, withCID, props.contractDetails.mintPrice )
+            .then(() => {
+                setTokenIDToMint('');
+                setInitTokenCID('');
+                searchParams.set('token-id', tokenIDToMint);
+                setIsLoading(false);
+                setIsMinted(true);
+            }).catch((error) => {
+                setIsError('Error from contract:' + error);
+                setIsLoading(false);
+            });
+        }else{
+            setIsError(validator.msg);
+        }
     }
 
-
-
+    
     const withCIDRadioButtonChange = (e) => { setWithCID(e.target.value=='with')}
 
-    const notIsContractLoaded = !props.isContractLoaded
 
     return (
 <>
@@ -72,6 +85,7 @@ function MintAToken(props){
         {isMinted && (<div className="search-results my-3 p-3">
             <div className="mt-2">Minted Successfully - <Link to={{ pathname: '/token-profile', search: searchParams.toString()}}>Token Profile</Link></div>
         </div>)}
+        {isError &&  ((<GenericFieldSetError key="minted_token_error" errorMsg={isError} />)) }
     </div>
 </>)
 }

@@ -16,12 +16,15 @@ function BrowseByTokenID(props){
 
 
   const callGetTokenByID = () => {
-    if (intValidate(tokenIDValue)){
+    const validator = intValidate(tokenIDValue)
+    if (validator.valid) {
       setIsLoading(true);
       getTokenByTokenID(props.contractDetails.contractAddress, tokenIDValue).then((resp) => { setTokenSearchResults( resp ); setIsLoading(false);})
     } 
-    else setIsError('error')
+    else setIsError(validator.msg)
   }
+
+  const tokenByIDKeyDown  = (e) => { e.key === 'Enter' && callGetTokenByID();}
 
   const tokenIDChange = (e) => {setIsError('');setTokenIDValue(e.target.value)}
 
@@ -32,11 +35,11 @@ function BrowseByTokenID(props){
 <div className="col-12  my-3">
   <label htmlFor="browse-token-id" className="form-label">WNFT Token ID</label>
   <div className="input-group">
-    <input type="text" className="form-control shadow-lg rounded" name="browse-token-id" id="browse-token-id" onChange={tokenIDChange} value={tokenIDValue} disabled={notIsContractLoaded ? 'disabled' : null}  />
+    <input type="text" className="form-control shadow-lg rounded" name="browse-token-id" id="browse-token-id" onChange={tokenIDChange} onKeyDown={tokenByIDKeyDown} value={tokenIDValue} disabled={notIsContractLoaded ? 'disabled' : null}  />
     <button type="submit" className="btn btn-blue" onClick={callGetTokenByID} disabled={notIsContractLoaded ? 'disabled' : null}>SHOW</button>
   </div>
   {!isError && (tokenSearchResults?.tokenExists !== undefined) && (<BrowseByTokenIDResult tokenSearchResults={tokenSearchResults} key="browse_by_token_id_results" />) }
-  {isError &&  (<GenericFieldSetError  key="browse_by_token_id_input_error" />) }
+  {isError &&  (<GenericFieldSetError  key="browse_by_token_id_input_error" errorMsg={isError} />) }
   { isLoading && (<img src={loading_gif} />)}
 
 </div>)

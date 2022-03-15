@@ -1,7 +1,7 @@
 import GenericFieldSet from "../../generics/GenericFieldSet";
 import { setTokenOnchainMetadataString, setTokenOnchainMetadataUint } from "../../data/WnftContract";
+import { getTypeFromInterfactSignature } from "../../data/WnftUtils";
 
-const signatures = {'0x661f2816': 'str', '0x2421c19b': 'uint'}
 
 function TokenOnchainMetadataValues(props){
     const fieldName = props.item.fieldName
@@ -11,7 +11,7 @@ function TokenOnchainMetadataValues(props){
         let promise = new Promise(function (resolve, reject) {
            // four functions to set token onchain metadata
            let setPromise
-           if(signatures[fieldInterface] === 'uint') setPromise = setTokenOnchainMetadataUint(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue);
+           if(getTypeFromInterfactSignature(fieldInterface) === 'uint') setPromise = setTokenOnchainMetadataUint(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue);
            else setPromise = setTokenOnchainMetadataString(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue)
            setPromise.then(() => {resolve(true);})
            .catch(() => reject('error'))

@@ -1,27 +1,14 @@
 import WNFTABI from '../../utils/contracts/WNFTABI'
 import { getChainId, getRpcUrl, getWebSocketRpcUrl } from '../../utils/provider'
 import { ethers } from "ethers";
-import { refactorCollectionMetadata, refactorTokenMetadataDefenition } from "./WnftUtils"
-
-// use the given Provider, e.g in Mist, or instantiate a new websocket provider
-
+import { refactorCollectionMetadata, refactorTokenMetadataDefenition, getTokenMetadataFetchFunction } from "./WnftUtils"
 
 const CONTRACT_NETWORK = 'GOERLI'
 
 const USE_WEBSOCKETS = true
 
-// 0x6C4651767139FDd95829424045a6f89909974BF4
-//
 
-const FIELD_NAME_INDEX = 0;
-const FIELD_SMART_CONTRACT_INDEX = 1;
-const FIELD_INTERFACE_INDEX = 2;
-
-const signatures = {'0x661f2816': 'str', '0x2421c19b': 'uint'}
-
-
-export const transferToken = async (contractAddress, transferTo, tokenId) => {
-
+const getProvider = async () => {
   let isWallet = false;
   let provider;
   if (window.ethereum){
@@ -34,6 +21,19 @@ export const transferToken = async (contractAddress, transferTo, tokenId) => {
     }
     
   }
+  if (provider===undefined){
+    if (USE_WEBSOCKETS){
+      provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
+    }else{
+      provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
+    }
+  }
+  return {'provider': provider, 'isWallet': isWallet}
+}
+
+export const transferToken = async (contractAddress, transferTo, tokenId) => {
+
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
@@ -42,31 +42,20 @@ export const transferToken = async (contractAddress, transferTo, tokenId) => {
 
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
       const setTokenTransferFromTx = await WNFT_contract.transferFrom(signer.getAddress(), transferTo, tokenId)
-      setTokenTransferFromTx.wait()
+      await setTokenTransferFromTx.wait()
       console.log('set done')
 
   
     }catch(e) {
       console.error('Error changing "transferToken" remote contract', e.name, ': ', e.message)
-
+      throw e.message;
     }
 
   }
 }
 
 export const setWnftOffchainMetadata = async (contractAddress, wnftOffchainMetadataURI) => {
-    let isWallet = false;
-    let provider;
-    if (window.ethereum){
-      provider = new ethers.providers.Web3Provider( window.ethereum )
-      const { chainId } = await provider.getNetwork();
-      if (chainId!==getChainId(CONTRACT_NETWORK)){
-        provider = undefined;
-      }else{
-        isWallet = true;
-      }
-      
-    }
+  const {provider, isWallet} = await getProvider()
 
     const signer = provider.getSigner(0);
   
@@ -75,11 +64,11 @@ export const setWnftOffchainMetadata = async (contractAddress, wnftOffchainMetad
         const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
 
         const setWnftUriTx = await WNFT_contract.setWnftUri(wnftOffchainMetadataURI)
-        setWnftUriTx.wait()
+        await setWnftUriTx.wait()
         console.log('set done')
       }catch(e) {
-        console.error('Error changing "wnftOffchainMetadataURI" remote contract' + e.name + ': ' + e.message)
-
+        console.error('Error changing "setWnftOffchainMetadata" remote contract' + e.name + ': ' + e.message)
+        throw e.message;
       }
 
   }
@@ -87,18 +76,8 @@ export const setWnftOffchainMetadata = async (contractAddress, wnftOffchainMetad
 
 
 export const setCollectionOnchainMetadata = async (contractAddress, fieldName, fieldValue) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
+
 
   const signer = provider.getSigner(0);
 
@@ -113,26 +92,16 @@ export const setCollectionOnchainMetadata = async (contractAddress, fieldName, f
 
 
     }catch(e) {
-      console.error('Error changing "wnftOffchainMetadataURI" remote contract' + e.name + ': ' + e.message)
-
+      console.error('Error changing "setCollectionOnchainMetadata" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
     }
 
   }
 }
 
 export const setTokenOnchainMetadataField = async (contractAddress, fieldName, fieldSmartContractInterface, fieldSmartContractAddress) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
+
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -144,28 +113,16 @@ export const setTokenOnchainMetadataField = async (contractAddress, fieldName, f
 
     }catch(e) {
       console.error('Error changing "setEnsContenthash" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
 }
 
 
-
 export const setTokenOnchainMetadataString = async (contractAddress, tokenId, fieldName, fieldValue) => {
-  //
-    let isWallet = false;
-    let provider;
-    if (window.ethereum){
-      provider = new ethers.providers.Web3Provider( window.ethereum )
-      const { chainId } = await provider.getNetwork();
-      if (chainId!==getChainId(CONTRACT_NETWORK)){
-        provider = undefined;
-      }else{
-        isWallet = true;
-      }
-      
-    }
+  const {provider, isWallet} = await getProvider()
+
   
     const signer = provider.getSigner(0);
   
@@ -179,26 +136,15 @@ export const setTokenOnchainMetadataString = async (contractAddress, tokenId, fi
   
       }catch(e) {
         console.error('Error changing "setTokenOnchainMetadataString" remote contract' + e.name + ': ' + e.message)
-  
+        throw e.message;
       }
   
     }
   }
 
 export const setTokenOnchainMetadataUint = async (contractAddress, tokenId, fieldName, fieldValue) => {
-  //
-    let isWallet = false;
-    let provider;
-    if (window.ethereum){
-      provider = new ethers.providers.Web3Provider( window.ethereum )
-      const { chainId } = await provider.getNetwork();
-      if (chainId!==getChainId(CONTRACT_NETWORK)){
-        provider = undefined;
-      }else{
-        isWallet = true;
-      }
-      
-    }
+  const {provider, isWallet} = await getProvider()
+
   
     const signer = provider.getSigner(0);
   
@@ -212,7 +158,7 @@ export const setTokenOnchainMetadataUint = async (contractAddress, tokenId, fiel
   
       }catch(e) {
         console.error('Error changing "setTokenOnchainMetadataUint" remote contract' + e.name + ': ' + e.message)
-  
+        throw e.message;
       }
   
     }
@@ -220,19 +166,8 @@ export const setTokenOnchainMetadataUint = async (contractAddress, tokenId, fiel
 
 
 export const setTokenURI = async (contractAddress, tokenId, tokenURI) => {
-//
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
@@ -246,7 +181,7 @@ export const setTokenURI = async (contractAddress, tokenId, tokenURI) => {
 
     }catch(e) {
       console.error('Error changing "setTokenURI" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
@@ -254,18 +189,7 @@ export const setTokenURI = async (contractAddress, tokenId, tokenURI) => {
 
 
 export const setMintingContractAddress = async (contractAddress, newMintingContractAddress) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
@@ -278,61 +202,38 @@ export const setMintingContractAddress = async (contractAddress, newMintingContr
       console.log('set done')
 
     }catch(e) {
-      console.error('Error changing "wnftOffchainMetadataURI" remote contract' + e.name + ': ' + e.message)
-
+      console.error('Error changing "setMintingContractAddress" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
     }
 
   }
 }
 
 
-export const setMintPrice = async (contractAddress, mintPrice) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+export const setMintPrice = async (contractAddress, mintPriceUSD) => {
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
   if (signer !== null) {
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
+      const mintPriceTenthOfCent = mintPriceUSD * (10**3)
 
-      const setTokenPriceTx = await WNFT_contract.setTokenPrice(mintPrice)
+      const setTokenPriceTx = await WNFT_contract.setTokenPrice(mintPriceTenthOfCent)
       await setTokenPriceTx.wait()
       console.log('set done')
 
     }catch(e) {
       console.error('Error changing "setMintPrice" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
 }
 
 export const mintToken = async (contractAddress, tokenIDToMint, initTokenCID, withCID, mintPrice) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
-
-
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
@@ -359,7 +260,7 @@ export const mintToken = async (contractAddress, tokenIDToMint, initTokenCID, wi
 
     }catch(e) {
       console.error('Error changing "mintToken" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
@@ -369,18 +270,7 @@ export const mintToken = async (contractAddress, tokenIDToMint, initTokenCID, wi
   
 
 export const setEnsResolver = async (contractAddress, ensResolver) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -391,8 +281,8 @@ export const setEnsResolver = async (contractAddress, ensResolver) => {
       console.log('set done')
 
     }catch(e) {
-      console.error('Error changing "wnftOffchainMetadataURI" remote contract' + e.name + ': ' + e.message)
-
+      console.error('Error changing "setEnsResolver" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
     }
 
   }
@@ -400,18 +290,7 @@ export const setEnsResolver = async (contractAddress, ensResolver) => {
 
 
 export const setEnsRegistar = async (contractAddress, ensRegistar) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -422,26 +301,16 @@ export const setEnsRegistar = async (contractAddress, ensRegistar) => {
       console.log('set done')
 
     }catch(e) {
-      console.error('Error changing "wnftOffchainMetadataURI" remote contract' + e.name + ': ' + e.message)
-
+      console.error('Error changing "setEnsRegistar" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
     }
 
   }
 }
 
 export const setEnsNode = async (contractAddress, ensNode) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
+
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -453,7 +322,7 @@ export const setEnsNode = async (contractAddress, ensNode) => {
 
     }catch(e) {
       console.error('Error changing "setEnsNode" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
@@ -461,18 +330,8 @@ export const setEnsNode = async (contractAddress, ensNode) => {
 
 
 export const setEnsContenthash = async (contractAddress, ensContenthash) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider, isWallet} = await getProvider()
+
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -484,36 +343,15 @@ export const setEnsContenthash = async (contractAddress, ensContenthash) => {
 
     }catch(e) {
       console.error('Error changing "setEnsContenthash" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
 }
 
-export const getTokenByTokenID = async (contractAddress, tokenId, withData, tokenMetadataFields) => {
+export const getTokenByTokenID = async (contractAddress, tokenId, withData, tokenOnchainMetadataDefenitions) => {
     let tokenExistsData;
-    let isWallet = false;
-    let provider;
-    if (window.ethereum){
-      provider = new ethers.providers.Web3Provider( window.ethereum )
-      const { chainId } = await provider.getNetwork();
-      if (chainId!==getChainId(CONTRACT_NETWORK)){
-        provider = undefined;
-      }else{
-        isWallet = true;
-      }
-      
-    }
-    //console.log('look for provider')
-    if (provider===undefined){
-      if (!USE_WEBSOCKETS){
-        provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
-      }else{
-        provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
-        
-      }
-    }
-
+    const {provider, isWallet} = await getProvider()
     const signer = provider.getSigner(0);
   
     if (signer !== null) {
@@ -540,21 +378,14 @@ export const getTokenByTokenID = async (contractAddress, tokenId, withData, toke
 
           let tokenMetadataValues = {}
           if(withData){
-            for (let i = 0;i<tokenMetadataFields[0].length;i++){
-              const fieldName = tokenMetadataFields[FIELD_NAME_INDEX][i];
-              const fieldInterface = tokenMetadataFields[FIELD_INTERFACE_INDEX][i];
-                if(signatures[fieldInterface]=='uint'){
-                  addFetchPromise((res) => { if (res) tokenMetadataValues[fieldName] = res }, WNFT_contract.tokenOnchainMetadataUint(tokenId, fieldName));
-                }else{
-                  addFetchPromise((res) => { if (res) tokenMetadataValues[fieldName] = res }, WNFT_contract.tokenOnchainMetadataString(tokenId, fieldName));
-
-                } 
-              
+            for (let fieldName in tokenOnchainMetadataDefenitions){
+              const tokenOnchainMetadataDefenition = tokenOnchainMetadataDefenitions[fieldName]
+              const tokenMetadataFetchFunction = getTokenMetadataFetchFunction(tokenOnchainMetadataDefenition);
+              addFetchPromise((res) => { if (res) tokenMetadataValues[fieldName] = res }, WNFT_contract[tokenMetadataFetchFunction](tokenId, fieldName));
             }
             
           }
         
-          
           const results = await Promise.all(fetchedPromises);
   
           for (var i in results){
@@ -595,42 +426,21 @@ export const getTokenByTokenID = async (contractAddress, tokenId, withData, toke
 
 export const getTokenByNthNum = async (contractAddress, nth_num) => {
   let tokenExistsData;
-  let provider;
-  let isWallet = false;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }
-    
-    
-  }
-  if (provider===undefined){
-    if (!USE_WEBSOCKETS){
-      provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
-    }else{
-      provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
-      
-    }
-  }
-
+  const {provider, isWallet} = await getProvider()
 
   const signer = provider.getSigner(0);
 
   if (signer !== null) {
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, provider);
-      //const tokenOwner = WNFT_contract.ownerOf(tokenId)
-      //tokenExistsData = {'owner': tokenOwner, 'id': tokenId}
-      //WNFT_contract.handleRevert = true;
+
       tokenExistsData = {}
       let tokenId;
       try{
         tokenId = await WNFT_contract.NthToken(nth_num);
         if(tokenId) tokenExistsData['tokenExists'] = true;
       }catch(e){
-        if (e.message && e.message.indexOf("Token doesn't exist")!=-1) tokenExistsData['tokenExists'] = false;
+        if (e.message && e.message.indexOf("Token doesn't exist")!==-1) tokenExistsData['tokenExists'] = false;
       }
       
       if (tokenExistsData['tokenExists']){
@@ -644,7 +454,6 @@ export const getTokenByNthNum = async (contractAddress, nth_num) => {
         console.error('Error reading remote contract' + e.name + ': ' + e.message)
 
       }
-    // console.log('fetched contract', name, symbol);
     
   }
   console.log(tokenExistsData)
@@ -653,18 +462,7 @@ export const getTokenByNthNum = async (contractAddress, nth_num) => {
 } 
 
 export const transferWntOwnership = async (contractAddress, newOwner) => {
-  let isWallet = false;
-  let provider;
-  if (window.ethereum){
-    provider = new ethers.providers.Web3Provider( window.ethereum )
-    const { chainId } = await provider.getNetwork();
-    if (chainId!==getChainId(CONTRACT_NETWORK)){
-      provider = undefined;
-    }else{
-      isWallet = true;
-    }
-    
-  }
+  const {provider} = await getProvider()
   const signer = provider.getSigner(0);
   if (signer !== null) {
     try{
@@ -676,7 +474,7 @@ export const transferWntOwnership = async (contractAddress, newOwner) => {
 
     }catch(e) {
       console.error('Error changing "transferWntOwnership" remote contract' + e.name + ': ' + e.message)
-
+      throw e.message;
     }
 
   }
@@ -684,43 +482,11 @@ export const transferWntOwnership = async (contractAddress, newOwner) => {
 
 
 export const WnftContract = async (contractAddress) => {
-  // const [contractDetails, setContractDetails] = useState({})
-  // const [error, setError] = useState("")
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [isLoaded, setIsLoaded] = useState(false)
-
-
-  
 
   let contractDetails = {};
 
+  const {provider, isWallet} = await getProvider()
 
-  let isWnftOwner = false;
-
-  //const fetchContract = async (contractAddress) => {
-    let isWallet = false;
-    let provider;
-    if (window.ethereum){
-      provider = new ethers.providers.Web3Provider( window.ethereum )
-      const { chainId } = await provider.getNetwork();
-      if (chainId!==getChainId(CONTRACT_NETWORK)){
-        provider = undefined;
-       
-      }else{
-        isWallet = true;
-      }
-      
-    }
-    //console.log('look for provider')
-    if (provider===undefined){
-      if (!USE_WEBSOCKETS){
-        provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
-      }else{
-        provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
-        
-      }
-    }
-  
   
     const signer = provider.getSigner(0);
   

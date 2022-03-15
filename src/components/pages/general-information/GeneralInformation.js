@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ethers } from "ethers";
 import ReactTooltip from 'react-tooltip';
 import {setWnftOffchainMetadata, transferWntOwnership} from "../../data/WnftContract"
 import GenericFieldSet from '../../generics/GenericFieldSet';
 import { ethAddressValidate } from "../../../utils/validators";
+import GenericFieldSetError from "../../generics/GenericFieldSetError";
+
 
 const loading_gif = require('../../../images/Loading_Animation.gif');
 
@@ -15,6 +16,8 @@ function GeneralInformation(props){
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [contractAddressValue, setContractAddressValue] = useState(props.contractAddress); 
+  const [isError, setIsError] = useState(''); 
+
 
   const notOwner = (!props.contractDetails?.isWnftOwner);
 
@@ -22,15 +25,18 @@ function GeneralInformation(props){
  
 
   const callFetchContract = () => {
-    if(ethers.utils.isAddress(contractAddressValue)){
+    setIsError('')
+    const validator = ethAddressValidate(contractAddressValue)
+    if(validator.valid){
       setSearchParams({ contract: contractAddressValue })
       props.setContractAddress(contractAddressValue);
     }else{
-      console.log('invalid address', contractAddressValue)
+      setIsError(validator.msg)
     }
 
   }
   const ContractAddressChange = (e) => setContractAddressValue(e.target.value)
+  const fetchContractKeyDown  = (e) => { e.key === 'Enter' && callFetchContract();}
 
   const callSetWnftOffchainMetadata = (wnftOffchainMetadataValue) => {
     let promise = new Promise(function (resolve, reject) {
@@ -64,10 +70,12 @@ function GeneralInformation(props){
       <label htmlFor="contract-address" className="form-label">Contract Address</label>
       <div className="input-group">
         
-        <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
+        <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} onKeyDown={fetchContractKeyDown} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
         <button  type="submit" className="btn btn-blue"  onClick={callFetchContract}>FETCH</button>
       </div>
       { props.isContractLoading && (<img src={loading_gif} />)}
+      {isError &&  ((<GenericFieldSetError key="contract-address_error" errorMsg={isError} />)) }
+
     </div>
     <div className="col-12 my-3">
       <label htmlFor="contract-name" className="form-label">Name</label>
