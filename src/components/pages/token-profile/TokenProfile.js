@@ -79,7 +79,7 @@ function TokenProfile(props){
                 <label htmlFor="website-cid" className="form-label">Owner</label>
                 <div className="show-value">{tokenDetails?.owner||''}</div>
             </div>
-            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Offchain metadata" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} validator={contentUriValidate} placeholder="Example: ipns://k51qzi5uqu5djwbl0zcd4g9onue26a8nq97c0m9wp6kir1gibuyjxpkqpoxwag" />
+            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Offchain metadata" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} validator={contentUriValidate} placeholder="Example: ipfs://QmZv2ZJiPsGWtmMC7LUqq2oThbyGhg74JH5DL84X6Yxx7L" />
 
             <GenericFieldSet mainClass="col-7  my-5" key="transfer-to-key" buttonLabel="TRANSFER" genericFieldLabel="" emptyLabel={true} genericFieldID="transfer-to" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callTransferTokenTo} initFieldValue="" validator={ethAddressValidate} />
 
