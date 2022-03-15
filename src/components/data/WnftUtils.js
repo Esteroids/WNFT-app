@@ -49,7 +49,7 @@ export const ensHashToCidUri = (ens_hash) => {
     if (ens_hash){
         try{
             const content = contentHash.decode(ens_hash)
-            const codec = contentHash.getCodec(ens_hash)
+            const codec = contentHash.getCodec(ens_hash).replace('-ns','')
             return codec + '://' + content
         }catch{
             return ''
