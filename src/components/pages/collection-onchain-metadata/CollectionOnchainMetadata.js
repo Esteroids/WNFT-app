@@ -79,7 +79,7 @@ function CollectionOnchainMetadata(props){
         </div>
         <div className="col-12 d-flex">
           <div className="col-sm-5 pr-3">
-            <input type="text" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="form-control" id="field-name" name="field-name" onChange={FieldNameChange} value={fieldName} />
+            <input type="text" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="form-control" id="field-name" name="field-name" onChange={FieldNameChange} value={fieldName} placeholder="Example: My Field" />
           </div>
           <div className="col-sm-5 pr-3">
           <input type="text" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="form-control" id="field-value" name="field-value" onChange={FieldValueChange} value={fieldValue} />

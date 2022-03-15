@@ -44,7 +44,7 @@ function GenericFieldSet(props){
 <div className={props.mainClass || "col-12  my-3"}>
   {fieldLabelElement}
   <div className="input-group">
-    <input type="text" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="form-control shadow-lg rounded" name={props.genericFieldID} id={props.genericFieldID}  onChange={genericFieldValueChange} onKeyDown={genericFieldKeyDown} value={genericFieldValue} />
+    <input type="text" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="form-control shadow-lg rounded" name={props.genericFieldID} id={props.genericFieldID}  onChange={genericFieldValueChange} onKeyDown={genericFieldKeyDown} value={genericFieldValue} placeholder={props.placeholder} />
     <button type="submit" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="btn btn-secondary" onClick={callSetGenericFieldValue}>{buttonLabel}</button>
   </div>
   { isLoading && (<img src={loading_gif} />)}
