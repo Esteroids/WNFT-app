@@ -1,4 +1,4 @@
-import contentHash from 'content-hash';
+import contentHash from '@ensdomains/content-hash';
 
 
 const collectionMetadataIndex = {fieldName: 0, fieldValue: 1};
@@ -48,8 +48,11 @@ export const ensHashToCidUri = (ens_hash) => {
     }
     if (ens_hash){
         try{
-            const content = contentHash.decode(ens_hash)
+            let content = contentHash.decode(ens_hash)
             const codec = contentHash.getCodec(ens_hash).replace('-ns','')
+            if (codec === 'ipfs' && content.startsWith('Q')){
+                content = contentHash.helpers.cidV0ToV1Base32(content)
+            }
             return codec + '://' + content
         }catch{
             return ''
