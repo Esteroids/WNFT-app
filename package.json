@@ -8,7 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "5.1.3",
     "buffer": "^6.0.3",
-    "content-hash": "https://github.com/pldespaigne/content-hash",
+    "content-hash": "^2.5.2",
     "ethers": "^5.5.1",
     "process": "^0.11.10",
     "react": "^17.0.2",

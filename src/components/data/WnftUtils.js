@@ -61,10 +61,8 @@ export const ensHashToCidUri = (ens_hash) => {
 }
 
 
-
 export const cidUriToEnsHash = (cidUri) => {
     const [codecUri, cid] = cidUri.split('://')
-    return contentHash.encode(codecUri + '-ns', cid);
+    return '0x' + contentHash.encode(codecUri + '-ns', cid);
 
 }
-

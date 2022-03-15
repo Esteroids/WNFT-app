@@ -3339,9 +3339,10 @@ content-disposition@0.5.4:
   dependencies:
     safe-buffer "5.2.1"
 
-"content-hash@https://github.com/pldespaigne/content-hash":
+content-hash@^2.5.2:
   version "2.5.2"
-  resolved "https://github.com/pldespaigne/content-hash#695370ae890ead943592627e08e83a0be7f59a66"
+  resolved "https://registry.yarnpkg.com/content-hash/-/content-hash-2.5.2.tgz#bbc2655e7c21f14fd3bfc7b7d4bfe6e454c9e211"
+  integrity sha512-FvIQKy0S1JaWV10sMsA7TRx8bpU+pqPkhbsfvOJAdjRXvYxEckAwQWGwtRjiaJfh+E0DvcWUGqcdjwMGFjsSdw==
   dependencies:
     cids "^0.7.1"
     multicodec "^0.5.5"

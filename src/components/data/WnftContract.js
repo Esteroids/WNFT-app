@@ -356,9 +356,9 @@ export const setEnsCidUri = async (contractAddress, ensCidUri) => {
   if (signer !== null) {
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
-
+      console.log(ensCidUri)
       const ensContenthash = cidUriToEnsHash(ensCidUri)
-
+      console.log('content hash', ensContenthash)
       const setENSContenthashTx = await WNFT_contract.setENSContenthash(ensContenthash)
       await setENSContenthashTx.wait()
       console.log('set done')

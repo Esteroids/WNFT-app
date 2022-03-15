@@ -19,6 +19,7 @@ function GenericFieldSet(props){
     const genericFieldKeyDown = (e) => { e.key === 'Enter' && callSetGenericFieldValue();}
 
     const callSetGenericFieldValue = async () => {
+      setIsError('');
         if (props.validator){
           const validate_status = props.validator(genericFieldValue)
           console.log(validate_status)
