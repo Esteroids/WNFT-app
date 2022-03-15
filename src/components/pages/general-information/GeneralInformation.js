@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
 import {setWnftOffchainMetadata, transferWntOwnership} from "../../data/WnftContract"
 import GenericFieldSet from '../../generics/GenericFieldSet';
-import { ethAddressValidate } from "../../../utils/validators";
+import { ethAddressValidate, contentUriValidate } from "../../../utils/validators";
 import GenericFieldSetError from "../../generics/GenericFieldSetError";
 
 
@@ -42,7 +42,7 @@ function GeneralInformation(props){
     let promise = new Promise(function (resolve, reject) {
       setWnftOffchainMetadata(props?.contractDetails?.contractAddress, wnftOffchainMetadataValue)
       .then(() => {props.setContractDetails({...props.contractDetails, wnftOffchainMetadata: wnftOffchainMetadataValue});resolve(true);})
-      .catch(() => reject('error'))
+      .catch((e) => reject(e))
     });
     return promise;
   }
@@ -54,7 +54,7 @@ function GeneralInformation(props){
         props.setContractDetails({...props.contractDetails, wnftOwner: transferTo, isWnftOwner: false});
         resolve(true);
       })
-      .catch(() => reject('error'))
+      .catch((e) => reject(e))
     });
     return promise;
   }
@@ -97,7 +97,7 @@ function GeneralInformation(props){
       </div>
     </div>
    
-    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="Offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} />
+    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="Offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} validator={contentUriValidate} />
 
     <GenericFieldSet key="wnft-transfer-key" genericFieldLabel="Transfer" buttonLabel="TRANSFER" genericFieldID="wnft-transfer" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callTransferWnft} initFieldValue="" validator={ethAddressValidate} />
 

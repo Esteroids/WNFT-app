@@ -100,7 +100,7 @@ function TokenOnchainMetadata(props){
             <div className="col-sm-5">
             </div>
             <div className="col-sm-1">
-              <button  type="submit" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="btn btn-blue form-control" onClick={callSetTokenOnchainMetadataField} >SET</button>
+              <button  type="submit" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="btn btn-secondary form-control" onClick={callSetTokenOnchainMetadataField} >SET</button>
             </div>
           </div>
           { isLoading && (<div className="col-12 d-flex"><img src={loading_gif} /></div>)}

@@ -15,6 +15,16 @@ import { ethers } from "ethers";
 //     return Math.log(e) / Math.LN10;
 //   }
 
+
+const remove_non_ascii = (str) => {
+    if ((str===null) || (str===''))
+         return false;
+   else
+     str = str.toString();
+  
+    return str.replace(/[^\x20-\x7E]/g, '');
+}
+
 const responseStruct = (valid, msg) => {
     return {'valid': valid, 'msg': (!valid && msg) || undefined}
 }
@@ -29,6 +39,19 @@ export const intValidate = (val) => {
     var n = Math.floor(Number(val));
     return responseStruct(n !== Infinity && String(n) === val && n >= 0, 'Input must be an integer, "' + val.toString() + '" is invalid')
 }
+
+
+export const contentUriValidate = (val) => responseStruct(val && (val.startsWith( "ipfs://" ) || val.startsWith( "ipns://" )), 'Input must be IPFS or IPNS uri,  "' + val.toString() + '" is invalid')
+
+// export const contentUriValidate = (val) => {
+//     if (val){
+//         val = remove_non_ascii(val.trim().replace(/\s/g,''));
+//     }
+//     // handle case for "ens style" that the hash starts with "ipfs://"
+//     return (val && val.startsWith( "ipfs://" ))
+    
+// }
+  
 
 //const maxMintPriceDecimalPoints = 3
 //export const mintPriceValidate = (val) => ((isNaN(val) && numberValidate(val)) || (responseStruct(getPrecision(val) <= maxMintPriceDecimalPoints, 'Input most not have decimal points less then tenth of a cent $0.001, "' + val.toString() + '" is invalid')))

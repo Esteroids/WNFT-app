@@ -4,7 +4,7 @@ import { getTokenByTokenID, setTokenURI, transferToken } from "../../data/WnftCo
 import BottomNav from "../../bottom-nav/BottomNav";
 import GenericFieldSet from '../../generics/GenericFieldSet';
 import TokenOnchainMetadataValues from "./TokenOnchainMetadataValues"
-import {ethAddressValidate} from "../../../utils/validators"
+import {ethAddressValidate, contentUriValidate} from "../../../utils/validators"
 
 
 function TokenProfile(props){
@@ -30,7 +30,7 @@ function TokenProfile(props){
     let promise = new Promise(function (resolve, reject) {
       setTokenURI(props?.contractDetails?.contractAddress, tokenDetails.id, tokenURIValue)
       .then(() => {setTokenDetails({...tokenDetails, tokenURI: tokenURIValue});resolve(true);})
-      .catch(() => reject('error'))
+      .catch((e) => reject(e))
     });
     return promise;
   }
@@ -42,7 +42,7 @@ function TokenProfile(props){
         setTokenDetails({...tokenDetails, owner: transferTokenTo, isTokenOwner: false});
         resolve(true);
       })
-      .catch(() => reject('error'))
+      .catch((e) => reject(e))
     });
     return promise;
   }
@@ -79,7 +79,7 @@ function TokenProfile(props){
                 <label htmlFor="website-cid" className="form-label">Owner</label>
                 <div className="show-value">{tokenDetails?.owner||''}</div>
             </div>
-            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Offchain metadata" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} />
+            <GenericFieldSet mainClass="col-7  my-3" key="token-uri-key" genericFieldLabel="Offchain metadata" genericFieldID="token-uri" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callSetTokenURI} initFieldValue={tokenDetails?.tokenURI} validator={contentUriValidate} />
 
             <GenericFieldSet mainClass="col-7  my-5" key="transfer-to-key" buttonLabel="TRANSFER" genericFieldLabel="" emptyLabel={true} genericFieldID="transfer-to" notOwnerAndNotLogin="" notOwner={notTokenOwner}  callSet={callTransferTokenTo} initFieldValue="" validator={ethAddressValidate} />
 

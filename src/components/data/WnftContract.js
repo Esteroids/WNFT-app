@@ -1,7 +1,7 @@
 import WNFTABI from '../../utils/contracts/WNFTABI'
 import { getChainId, getRpcUrl, getWebSocketRpcUrl } from '../../utils/provider'
 import { ethers } from "ethers";
-import { refactorCollectionMetadata, refactorTokenMetadataDefenition, getTokenMetadataFetchFunction } from "./WnftUtils"
+import { refactorCollectionMetadata, refactorTokenMetadataDefenition, getTokenMetadataFetchFunction, ensHashToCidUri, cidUriToEnsHash } from "./WnftUtils"
 
 const CONTRACT_NETWORK = 'GOERLI'
 
@@ -112,7 +112,7 @@ export const setTokenOnchainMetadataField = async (contractAddress, fieldName, f
       console.log('set done')
 
     }catch(e) {
-      console.error('Error changing "setEnsContenthash" remote contract' + e.name + ': ' + e.message)
+      console.error('Error changing "setTokenOnchainMetadataField" remote contract' + e.name + ': ' + e.message)
       throw e.message;
     }
 
@@ -349,6 +349,31 @@ export const setEnsContenthash = async (contractAddress, ensContenthash) => {
   }
 }
 
+export const setEnsCidUri = async (contractAddress, ensCidUri) => {
+  const {provider, isWallet} = await getProvider()
+
+  const signer = provider.getSigner(0);
+  if (signer !== null) {
+    try{
+      const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
+
+      const ensContenthash = cidUriToEnsHash(ensCidUri)
+
+      const setENSContenthashTx = await WNFT_contract.setENSContenthash(ensContenthash)
+      await setENSContenthashTx.wait()
+      console.log('set done')
+
+    }catch(e) {
+      console.error('Error changing "setEnsContenthash" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
+    }
+
+  }
+}
+
+
+
+
 export const getTokenByTokenID = async (contractAddress, tokenId, withData, tokenOnchainMetadataDefenitions) => {
     let tokenExistsData;
     const {provider, isWallet} = await getProvider()
@@ -535,6 +560,8 @@ export const WnftContract = async (contractAddress) => {
         
         fetchedData.collectionOnchainMetadata = refactorCollectionMetadata(fetchedData.collectionMetadataFieldRaw)
         fetchedData.tokenOnchainMetadataDefenitions = refactorTokenMetadataDefenition(fetchedData.tokenMetadataField)
+
+        fetchedData.ensCidUri = ensHashToCidUri(fetchedData.ensContenthash)
         
         fetchedData.isWnftOwner = isWnftOwner;
         fetchedData.mintPrice = parseFloat((fetchedData.wnftPriceInUSDPOW8 / (10**8)));

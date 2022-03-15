@@ -38,8 +38,8 @@ function MintAToken(props){
                 searchParams.set('token-id', tokenIDToMint);
                 setIsLoading(false);
                 setIsMinted(true);
-            }).catch((error) => {
-                setIsError('Error from contract:' + error);
+            }).catch((e) => {
+                setIsError('Error from contract:' + e);
                 setIsLoading(false);
             });
         }else{
@@ -76,7 +76,7 @@ function MintAToken(props){
             
         </div>
         {withCID && (<div className="col-12 my-3">
-            <label htmlFor="init-cid-to-token" className="form-label">Init CID to token</label>
+            <label htmlFor="init-cid-to-token" className="form-label">Initial token offchain metadata</label>
             <div className="input-group">
                 <input type="text" className="form-control shadow-lg rounded" name="init-cid-to-token" id="init-cid-to-token" value={initTokenCID} disabled={notIsContractLoaded ? 'disabled' : null} onChange={initTokenCIDChange} />
             </div>

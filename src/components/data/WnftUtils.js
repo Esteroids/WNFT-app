@@ -1,3 +1,6 @@
+import contentHash from 'content-hash';
+
+
 const collectionMetadataIndex = {fieldName: 0, fieldValue: 1};
 
 const tokenMetadataDefenitionIndex = {fieldName: 0, smartContractAddress: 1, smartContractInterface: 2};
@@ -38,3 +41,30 @@ export const getTokenMetadataFetchFunction = (tokenOnchainMetadataDefenition) =>
     return wnftFunctionTypeTokenOnchainMetadata[signatureType];
     
 }
+
+export const ensHashToCidUri = (ens_hash) => {
+    if (ens_hash.startsWith('0x')){
+        ens_hash = ens_hash.substring('0x'.length)
+    }
+    if (ens_hash){
+        try{
+            const content = contentHash.decode(ens_hash)
+            const codec = contentHash.getCodec(ens_hash)
+            return codec + '://' + content
+        }catch{
+            return ''
+        }
+    }else{
+        return ''
+    }
+
+}
+
+
+
+export const cidUriToEnsHash = (cidUri) => {
+    const [codecUri, cid] = cidUri.split('://')
+    return contentHash.encode(codecUri + '-ns', cid);
+
+}
+

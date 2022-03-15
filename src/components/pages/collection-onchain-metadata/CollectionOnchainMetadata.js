@@ -85,7 +85,7 @@ function CollectionOnchainMetadata(props){
           <input type="text" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="form-control" id="field-value" name="field-value" onChange={FieldValueChange} value={fieldValue} />
           </div>
           <div className="col-sm-1">
-          <button  type="submit" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="btn btn-blue form-control" onClick={callSetCollectionOnchainMetadata} >SET</button>
+          <button  type="submit" data-tip={notOwnerAndNotLogin} disabled={notOwner ? 'disabled' : null} className="btn btn-secondary form-control" onClick={callSetCollectionOnchainMetadata} >SET</button>
           </div>
         </div>
         { isLoading && (<div className="col-12 d-flex"><img src={loading_gif} /></div>)}

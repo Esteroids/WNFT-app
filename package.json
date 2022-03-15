@@ -7,16 +7,20 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "5.1.3",
+    "buffer": "^6.0.3",
+    "content-hash": "https://github.com/pldespaigne/content-hash",
     "ethers": "^5.5.1",
+    "process": "^0.11.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
     "react-tooltip": "^4.2.21",
+    "stream-browserify": "^3.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-app-rewired start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -38,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-app-rewired": "^2.2.1"
   }
 }

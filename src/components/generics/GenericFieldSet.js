@@ -29,7 +29,11 @@ function GenericFieldSet(props){
           }
         }
         setIsLoading(true);
-        props.callSet(genericFieldValue).then(() => {setIsLoading(false);}).catch(() => {setIsLoading(false);})
+        props.callSet(genericFieldValue)
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch((e) => {setIsLoading(false);setIsError(e)})
     }
 
     const buttonLabel = props.buttonLabel || 'SET'

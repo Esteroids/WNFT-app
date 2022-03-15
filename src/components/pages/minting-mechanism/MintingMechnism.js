@@ -16,7 +16,7 @@ function MintingMechanism(props){
         let promise = new Promise(function (resolve, reject) {
             setMintingContractAddress(props?.contractDetails?.contractAddress, mintingContractAddress)
             .then(() => {props.setContractDetails({...props.contractDetails, mintingContract: mintingContractAddress});resolve(true);})
-            .catch(() => reject('error'))
+            .catch((e) => reject(e))
         });
         return promise;
     }
@@ -25,7 +25,7 @@ function MintingMechanism(props){
         let promise = new Promise(function (resolve, reject) {
         setMintPrice(props?.contractDetails?.contractAddress, mintPrice)
         .then(() => {props.setContractDetails({...props.contractDetails, mintPrice: mintPrice});resolve(true);})
-        .catch(() => reject('error'))
+        .catch((e) => reject(e))
     });
     return promise;
     }

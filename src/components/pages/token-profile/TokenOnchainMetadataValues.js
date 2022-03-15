@@ -14,7 +14,7 @@ function TokenOnchainMetadataValues(props){
            if(getTypeFromInterfactSignature(fieldInterface) === 'uint') setPromise = setTokenOnchainMetadataUint(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue);
            else setPromise = setTokenOnchainMetadataString(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue)
            setPromise.then(() => {resolve(true);})
-           .catch(() => reject('error'))
+           .catch((e) => reject(e))
         });
         return promise;
     }
