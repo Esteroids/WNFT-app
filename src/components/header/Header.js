@@ -4,7 +4,7 @@ import { useLocation, Link } from "react-router-dom";
 
 async function connect(onConnected) {
   if (!window.ethereum) {
-    alert("Get MetaMask!");
+    alert("MetaMask not found");
     return;
   }
 
@@ -41,8 +41,10 @@ function Header(props){
       props.setUserAddress('');
       checkIfWalletIsConnected(props.setUserAddress);
     }
-    window.ethereum.on('accountsChanged', resetAccount);
-    window.ethereum.on('disconnect', resetAccount);
+    if (window.ethereum){
+      window.ethereum.on('accountsChanged', resetAccount);
+      window.ethereum.on('disconnect', resetAccount);
+    }
     
   }, []);
 
