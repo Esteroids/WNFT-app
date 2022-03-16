@@ -67,7 +67,7 @@ function GeneralInformation(props){
   <h4 className="mb-3">General Information</h4>
   <div className='py-3'>
     <div className="col-12  my-3">
-      <label htmlFor="contract-address" className="form-label">Contract Address</label>
+      <label htmlFor="contract-address" className="form-label">Enter WNFT contract address</label>
       <div className="input-group">
         
         <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} onKeyDown={fetchContractKeyDown} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
