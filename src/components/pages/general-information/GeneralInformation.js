@@ -97,7 +97,7 @@ function GeneralInformation(props){
       </div>
     </div>
    
-    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="Offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} validator={contentUriValidate} placeholder="Example: ipfs://QmZv2ZJiPsGWtmMC7LUqq2oThbyGhg74JH5DL84X6Yxx7L" />
+    <GenericFieldSet key="wnft-offchain-metadata-key" genericFieldLabel="Offchain metadata" genericFieldID="wnft-offchain-metadata" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callSetWnftOffchainMetadata} initFieldValue={props.contractDetails?.wnftOffchainMetadata} validator={contentUriValidate} placeholder="Example: ipns://k51qzi5uqu5djwbl0zcd4g9onue26a8nq97c0m9wp6kir1gibuyjxpkqpoxwag" />
 
     <GenericFieldSet key="wnft-transfer-key" genericFieldLabel="Transfer" buttonLabel="TRANSFER" genericFieldID="wnft-transfer" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callTransferWnft} initFieldValue="" validator={ethAddressValidate} />
 

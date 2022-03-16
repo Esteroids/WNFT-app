@@ -78,7 +78,7 @@ function MintAToken(props){
         {withCID && (<div className="col-12 my-3">
             <label htmlFor="init-cid-to-token" className="form-label">Initial token offchain metadata</label>
             <div className="input-group">
-                <input type="text" className="form-control shadow-lg rounded" name="init-cid-to-token" id="init-cid-to-token" value={initTokenCID} disabled={notIsContractLoaded ? 'disabled' : null} onChange={initTokenCIDChange} placeholder="Example: ipfs://QmZv2ZJiPsGWtmMC7LUqq2oThbyGhg74JH5DL84X6Yxx7L" />
+                <input type="text" className="form-control shadow-lg rounded" name="init-cid-to-token" id="init-cid-to-token" value={initTokenCID} disabled={notIsContractLoaded ? 'disabled' : null} onChange={initTokenCIDChange} placeholder="Example: ipns://k51qzi5uqu5djwbl0zcd4g9onue26a8nq97c0m9wp6kir1gibuyjxpkqpoxwag" />
             </div>
         </div>) }
         { isLoading && (<div className="col-12 d-flex"><img src={loading_gif} /></div>)}
