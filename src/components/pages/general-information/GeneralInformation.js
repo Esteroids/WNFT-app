@@ -68,10 +68,10 @@ function GeneralInformation(props){
     if (props?.contractDetails?.contractAddress){
       let promise = new Promise(function (resolve, reject) {
         getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
-          console.log('balance', balance.toNumber())
-          withdrawBalance(props?.contractDetails?.contractAddress, withdrawTo, balance.toNumber()).then(() => {
+          console.log('balance', balance.toString())
+          withdrawBalance(props?.contractDetails?.contractAddress, withdrawTo, balance.toString()).then(() => {
             getAddressBalance(props?.contractDetails?.contractAddress).then((newBalance) => {
-              console.log('newBalance', newBalance.toNumber())
+              console.log('newBalance', newBalance.toString())
             })
             resolve(true);
           })
@@ -88,7 +88,7 @@ function GeneralInformation(props){
 
   const callGetBalance = () => {
     getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
-      console.log('balance', balance.toNumber())
+      console.log('balance', balance.toString())
       setContractBalance(balance.toString() + " wei")
     })
     .catch((e) => console.error(e))

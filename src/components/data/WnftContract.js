@@ -3,9 +3,9 @@ import { getChainId, getRpcUrl, getWebSocketRpcUrl } from '../../utils/provider'
 import { ethers } from "ethers";
 import { refactorCollectionMetadata, refactorTokenMetadataDefenition, getTokenMetadataFetchFunction, ensHashToCidUri, cidUriToEnsHash } from "./WnftUtils"
 
-const CONTRACT_NETWORK = 'GOERLI'
+const CONTRACT_NETWORK = 'POLYGON'
 
-const USE_WEBSOCKETS = true
+const USE_WEBSOCKETS = false
 
 
 const getProvider = async () => {
@@ -14,6 +14,7 @@ const getProvider = async () => {
   if (window.ethereum){
     provider = new ethers.providers.Web3Provider( window.ethereum )
     const { chainId } = await provider.getNetwork();
+    console.log(chainId)
     if (chainId!==getChainId(CONTRACT_NETWORK)){
       provider = undefined;
     }else{
@@ -22,20 +23,22 @@ const getProvider = async () => {
     
   }
   if (provider===undefined){
+    console.log('not metamask')
     if (USE_WEBSOCKETS){
       provider = new ethers.providers.WebSocketProvider( getWebSocketRpcUrl(CONTRACT_NETWORK) );
     }else{
+      console.log(getRpcUrl(CONTRACT_NETWORK))
       provider = new ethers.providers.JsonRpcProvider( getRpcUrl(CONTRACT_NETWORK) );
     }
   }
-  return {'provider': provider, 'isWallet': isWallet}
+  return { provider, isWallet}
 }
 
 export const transferToken = async (contractAddress, transferTo, tokenId) => {
 
   const {provider, isWallet} = await getProvider()
 
-  const signer = provider.getSigner(0);
+  const signer = provider.getSigner();
 
   if (signer !== null) {
     try{
@@ -79,7 +82,7 @@ export const setCollectionOnchainMetadata = async (contractAddress, fieldName, f
   const {provider, isWallet} = await getProvider()
 
 
-  const signer = provider.getSigner(0);
+  const signer = provider.getSigner();
 
   if (signer !== null) {
     try{
@@ -102,7 +105,7 @@ export const setCollectionOnchainMetadata = async (contractAddress, fieldName, f
 export const setTokenOnchainMetadataField = async (contractAddress, fieldName, fieldSmartContractInterface, fieldSmartContractAddress) => {
   const {provider, isWallet} = await getProvider()
 
-  const signer = provider.getSigner(0);
+  const signer = provider.getSigner();
   if (signer !== null) {
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
@@ -124,7 +127,7 @@ export const setTokenOnchainMetadataString = async (contractAddress, tokenId, fi
   const {provider, isWallet} = await getProvider()
 
   
-    const signer = provider.getSigner(0);
+    const signer = provider.getSigner();
   
     if (signer !== null) {
       try{
@@ -146,7 +149,7 @@ export const setTokenOnchainMetadataUint = async (contractAddress, tokenId, fiel
   const {provider, isWallet} = await getProvider()
 
   
-    const signer = provider.getSigner(0);
+    const signer = provider.getSigner();
   
     if (signer !== null) {
       try{
@@ -169,7 +172,7 @@ export const setTokenURI = async (contractAddress, tokenId, tokenURI) => {
 
   const {provider, isWallet} = await getProvider()
 
-  const signer = provider.getSigner(0);
+  const signer = provider.getSigner();
 
   if (signer !== null) {
     try{
@@ -273,7 +276,7 @@ export const mintToken = async (contractAddress, tokenIDToMint, initTokenCID, wi
 
 export const setEnsResolver = async (contractAddress, ensResolver) => {
   const {provider, isWallet} = await getProvider()
-  const signer = provider.getSigner(0);
+  const signer = provider.getSigner();
   if (signer !== null) {
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
@@ -515,11 +518,13 @@ export const WnftContract = async (contractAddress) => {
   const {provider, isWallet} = await getProvider()
 
   
-    const signer = provider.getSigner(0);
+    const signer = provider.getSigner();
   
     if (signer !== null) {
       try{
         const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, provider);
+
+        console.log(await WNFT_contract.symbol());
 
         let fetchedPromises = [];
         let fetchedOrder = [];
@@ -541,7 +546,7 @@ export const WnftContract = async (contractAddress) => {
         addFetchPromise('ensRegistar', WNFT_contract.ENSRegistar());
         addFetchPromise('collectionMetadataFieldRaw', WNFT_contract.getCollectionMetadataField());
         addFetchPromise('tokenMetadataField', WNFT_contract.getTokenMetadataField());
-        addFetchPromise('ensContenthash', WNFT_contract.ensContenthash());
+        //
         
         
         const results = await Promise.all(fetchedPromises);
@@ -550,6 +555,11 @@ export const WnftContract = async (contractAddress) => {
           fetchedData[fetchedOrder[i]] = results[i];
         }
 
+        if (fetchedData.ensResolver!= ethers.constants.AddressZero){
+          fetchedData.ensContenthash = await WNFT_contract.ensContenthash();
+        }else{
+          fetchedData.ensContenthash =  ''
+        }
 
      
         let isWnftOwner = false;
@@ -572,6 +582,7 @@ export const WnftContract = async (contractAddress) => {
           ...fetchedData,
           }
         }catch(e) {
+          console.log(e)
           console.error('Error reading remote contract' + e.name + ': ' + e.message)
 
         }
