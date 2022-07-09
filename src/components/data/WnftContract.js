@@ -241,11 +241,13 @@ export const mintToken = async (contractAddress, tokenIDToMint, initTokenCID, wi
     try{
       const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
 
-      const price = ethers.BigNumber.from(140330173736)
-      const priceInETH = (mintPrice * 10 ** 8) / price
-      const priceInWie = ethers.BigNumber.from((Math.ceil(priceInETH * 10 ** 18)).toString())
+      // const price = ethers.BigNumber.from(140330173736)
+      // const priceInETH = (mintPrice * 10 ** 8) / price
+      // const priceInWie = ethers.BigNumber.from((Math.ceil(priceInETH * 10 ** 18)).toString())
+      const [inWei, inUSDPow8] = await WNFT_contract.getTokenPrice()
+
       let overrides = {
-        value: priceInWie
+        value: inWei
       };
       console.log(overrides)
       const mintTo = signer.getAddress()
@@ -580,5 +582,33 @@ export const WnftContract = async (contractAddress) => {
     console.log(contractDetails)
 
   return { contractDetails }
+}
+
+export const withdrawBalance = async (contractAddress, toAddress, withdrawValue) => {
+  const {provider} = await getProvider()
+  const signer = provider.getSigner(0);
+  if (signer !== null) {
+    try{
+      const WNFT_contract = new ethers.Contract(contractAddress, WNFTABI.abi, signer);
+
+      const withdrawTx = await WNFT_contract.withdraw(toAddress, ethers.BigNumber.from(withdrawValue))
+      await withdrawTx.wait()
+      console.log('set done')
+
+    }catch(e) {
+      console.error('Error changing "withdrawTx" remote contract' + e.name + ': ' + e.message)
+      throw e.message;
+    }
+
+  }
+}
+
+
+export const getAddressBalance = async (contractAddress) => {
+  const {provider, isWallet} = await getProvider()
+
+
+  return await provider.getBalance(contractAddress);
+
 }
 

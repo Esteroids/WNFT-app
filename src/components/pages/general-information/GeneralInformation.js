@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
-import {setWnftOffchainMetadata, transferWntOwnership} from "../../data/WnftContract"
+import {setWnftOffchainMetadata, transferWntOwnership, getAddressBalance, withdrawBalance} from "../../data/WnftContract"
 import GenericFieldSet from '../../generics/GenericFieldSet';
 import { ethAddressValidate, contentUriValidate } from "../../../utils/validators";
 import GenericFieldSetError from "../../generics/GenericFieldSetError";
@@ -18,6 +18,9 @@ function GeneralInformation(props){
   const [contractAddressValue, setContractAddressValue] = useState(props.contractAddress); 
   const [isError, setIsError] = useState(''); 
 
+  const [contractBalance, setContractBalance] = useState(''); 
+
+
 
   const notOwner = (!props.contractDetails?.isWnftOwner);
 
@@ -30,6 +33,7 @@ function GeneralInformation(props){
     if(validator.valid){
       setSearchParams({ contract: contractAddressValue })
       props.setContractAddress(contractAddressValue);
+      setContractBalance('')
     }else{
       setIsError(validator.msg)
     }
@@ -61,8 +65,36 @@ function GeneralInformation(props){
 
   
   const callWithdrawWnft = (withdrawTo) => {
-    
+    if (props?.contractDetails?.contractAddress){
+      let promise = new Promise(function (resolve, reject) {
+        getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
+          console.log('balance', balance.toNumber())
+          withdrawBalance(props?.contractDetails?.contractAddress, withdrawTo, balance.toNumber()).then(() => {
+            getAddressBalance(props?.contractDetails?.contractAddress).then((newBalance) => {
+              console.log('newBalance', newBalance.toNumber())
+            })
+            resolve(true);
+          })
+          .catch((e) => reject(e))
+          
+        })
+        .catch((e) => reject(e))
+      });
+      return promise;
+    }else{
+      console.error('no contract')
+    }
   }
+
+  const callGetBalance = () => {
+    getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
+      console.log('balance', balance.toNumber())
+      setContractBalance(balance.toString() + " wei")
+    })
+    .catch((e) => console.error(e))
+  }
+
+  
 
  
 
@@ -109,6 +141,9 @@ function GeneralInformation(props){
 
     {!notOwner && (<GenericFieldSet key="wnft-withdraw" genericFieldLabel="Withdraw" buttonLabel="WITHDRAW" genericFieldID="wnft-withdraw" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callWithdrawWnft} initFieldValue="" validator={ethAddressValidate} /> ) }
 
+    {!notOwner && (<div className="col-12  my-3">
+    <button type="submit" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="btn btn-secondary" onClick={callGetBalance}>Contract Balance</button> {contractBalance}
+    </div>) }
 
   </div>
 </>)
