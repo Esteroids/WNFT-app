@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import {getChainIdToDisplay} from "../../utils/provider"
+import { ethers } from "ethers";
 
 
 async function connect(onConnected) {
@@ -29,17 +31,33 @@ async function checkIfWalletIsConnected(onConnected) {
   }
 }
 
+const showWalletAddress = (walletAddress) => {
+  if(!walletAddress) return walletAddress;
+
+  return walletAddress.substring(0, 4) + "..." + walletAddress.substring(walletAddress.length-4, walletAddress.length);    
+}
+
 
 function Header(props){
 
   const { search } = useLocation();
+  const [ networkName, setNetworkName ] = useState('')
 
 
-  useEffect(() => {
+
+  useEffect(async () =>  {
     checkIfWalletIsConnected(props.setUserAddress);
-    const resetAccount = () => {
+    if (window.ethereum){
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      setNetworkName(getChainIdToDisplay(ethers.BigNumber.from(chainId).toNumber()))
+    }
+    const resetAccount = async () => {
       props.setUserAddress('');
       checkIfWalletIsConnected(props.setUserAddress);
+      if (window.ethereum){
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        setNetworkName(getChainIdToDisplay(ethers.BigNumber.from(chainId).toNumber()))
+      }
     }
     if (window.ethereum){
       window.ethereum.on('accountsChanged', resetAccount);
@@ -79,7 +97,7 @@ function Header(props){
       <div className="nav">
         <div className='nav-item'>
           {props.userAddress=="" && (<button className="nav-link btn btn-blue" onClick={() => connect(props.setUserAddress)} >Connect</button>) }
-          {props.userAddress!="" && (<button className="nav-link btn btn-green" >Connected</button>)}
+          {props.userAddress!="" && (<button className="nav-link btn btn-green" >{networkName || "Connected"} {showWalletAddress(props.userAddress)}</button>)}
         </div>
       
       </div>

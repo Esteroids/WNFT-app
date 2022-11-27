@@ -14,7 +14,7 @@ function EnsAction(props){
 
   const callSetEnsNode = (ensNode) => {
     let promise = new Promise(function (resolve, reject) {
-      setEnsNode(props?.contractDetails?.contractAddress, ensNode)
+      setEnsNode(props?.contractDetails?.contractAddress, props?.contractDetails?.contractNetwork, ensNode)
       .then(() => {props.setContractDetails({...props.contractDetails, ensNodeId: ensNode});resolve(true);})
       .catch((e) => reject(e))
     });
@@ -24,7 +24,7 @@ function EnsAction(props){
 
   const callSetEnsCid = (ensCid) => {
     let promise = new Promise(function (resolve, reject) {
-      setEnsCidUri(props?.contractDetails?.contractAddress, ensCid)
+      setEnsCidUri(props?.contractDetails?.contractAddress, props?.contractDetails?.contractNetwork, ensCid)
       .then(() => {props.setContractDetails({...props.contractDetails, ensCidUri: ensCid});resolve(true);})
       .catch((e) => reject(e))
     });
@@ -34,7 +34,7 @@ function EnsAction(props){
   const callSetEnsResolver = (ensResolver) => {
     let promise = new Promise(function (resolve, reject) {
 
-    setEnsResolver(props?.contractDetails?.contractAddress, ensResolver)
+    setEnsResolver(props?.contractDetails?.contractAddress, props?.contractDetails?.contractNetwork, ensResolver)
     .then(() => {props.setContractDetails({...props.contractDetails, ensResolver: ensResolver});resolve(true);})
     .catch((e) => reject(e))
   });
@@ -44,7 +44,7 @@ function EnsAction(props){
   const callSetEnsRegistar = (ensRegistar) => {
     let promise = new Promise(function (resolve, reject) {
 
-      setEnsRegistar(props?.contractDetails?.contractAddress, ensRegistar)
+      setEnsRegistar(props?.contractDetails?.contractAddress,  props?.contractDetails?.contractNetwork, ensRegistar)
       .then(() => {props.setContractDetails({...props.contractDetails, ensRegistar: ensRegistar});resolve(true);})
       .catch((e) => reject(e))
     });

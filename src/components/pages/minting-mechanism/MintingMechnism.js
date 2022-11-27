@@ -14,7 +14,7 @@ function MintingMechanism(props){
 
     const callSetMintingContract = (mintingContractAddress) => {
         let promise = new Promise(function (resolve, reject) {
-            setMintingContractAddress(props?.contractDetails?.contractAddress, mintingContractAddress)
+            setMintingContractAddress(props?.contractDetails?.contractAddress,  props.contractDetails.contractNetwork, mintingContractAddress)
             .then(() => {props.setContractDetails({...props.contractDetails, mintingContract: mintingContractAddress});resolve(true);})
             .catch((e) => reject(e))
         });
@@ -23,7 +23,7 @@ function MintingMechanism(props){
 
     const callSetMintPrice = (mintPrice) => {
         let promise = new Promise(function (resolve, reject) {
-        setMintPrice(props?.contractDetails?.contractAddress, mintPrice)
+        setMintPrice(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, mintPrice)
         .then(() => {props.setContractDetails({...props.contractDetails, mintPrice: mintPrice});resolve(true);})
         .catch((e) => reject(e))
     });

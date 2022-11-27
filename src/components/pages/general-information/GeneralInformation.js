@@ -5,17 +5,19 @@ import {setWnftOffchainMetadata, transferWntOwnership, getAddressBalance, withdr
 import GenericFieldSet from '../../generics/GenericFieldSet';
 import { ethAddressValidate, contentUriValidate } from "../../../utils/validators";
 import GenericFieldSetError from "../../generics/GenericFieldSetError";
-
+import { getSupportedChains } from "../../../utils/provider";
 
 const loading_gif = require('../../../images/Loading_Animation.gif');
 
 
-
+const NO_SELECTED_NETWORK = 'Choose Network'
 
 function GeneralInformation(props){
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [contractAddressValue, setContractAddressValue] = useState(props.contractAddress); 
+  const [contractNetworkValue, setContractNetworkValue] = useState(props.contractNetwork); 
+
   const [isError, setIsError] = useState(''); 
 
   const [contractBalance, setContractBalance] = useState(''); 
@@ -29,11 +31,16 @@ function GeneralInformation(props){
 
   const callFetchContract = () => {
     setIsError('')
+    setContractBalance('')
     const validator = ethAddressValidate(contractAddressValue)
     if(validator.valid){
-      setSearchParams({ contract: contractAddressValue })
-      props.setContractAddress(contractAddressValue);
-      setContractBalance('')
+      if (contractNetworkValue && contractNetworkValue!==NO_SELECTED_NETWORK){
+        setSearchParams({ contract: contractAddressValue, network: contractNetworkValue })
+        props.setContractAddress(contractAddressValue);
+        setContractBalance('')
+      }else{
+        setIsError("You must choose a network")
+      }
     }else{
       setIsError(validator.msg)
     }
@@ -42,9 +49,11 @@ function GeneralInformation(props){
   const ContractAddressChange = (e) => setContractAddressValue(e.target.value)
   const fetchContractKeyDown  = (e) => { e.key === 'Enter' && callFetchContract();}
 
+  const ContractNetworkChange = (e) => setContractNetworkValue(e.target.value)
+
   const callSetWnftOffchainMetadata = (wnftOffchainMetadataValue) => {
     let promise = new Promise(function (resolve, reject) {
-      setWnftOffchainMetadata(props?.contractDetails?.contractAddress, wnftOffchainMetadataValue)
+      setWnftOffchainMetadata(props?.contractDetails?.contractAddress,  props.contractDetails.contractNetwork, wnftOffchainMetadataValue)
       .then(() => {props.setContractDetails({...props.contractDetails, wnftOffchainMetadata: wnftOffchainMetadataValue});resolve(true);})
       .catch((e) => reject(e))
     });
@@ -53,7 +62,7 @@ function GeneralInformation(props){
   
   const callTransferWnft = (transferTo) => {
     let promise = new Promise(function (resolve, reject) {
-      transferWntOwnership(props?.contractDetails?.contractAddress, transferTo)
+      transferWntOwnership(props?.contractDetails?.contractAddress,  props.contractDetails.contractNetwork, transferTo)
       .then(() => {
         props.setContractDetails({...props.contractDetails, wnftOwner: transferTo, isWnftOwner: false});
         resolve(true);
@@ -67,12 +76,9 @@ function GeneralInformation(props){
   const callWithdrawWnft = (withdrawTo) => {
     if (props?.contractDetails?.contractAddress){
       let promise = new Promise(function (resolve, reject) {
-        getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
+        getAddressBalance(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork).then((balance) => {
           console.log('balance', balance.toString())
-          withdrawBalance(props?.contractDetails?.contractAddress, withdrawTo, balance.toString()).then(() => {
-            getAddressBalance(props?.contractDetails?.contractAddress).then((newBalance) => {
-              console.log('newBalance', newBalance.toString())
-            })
+          withdrawBalance(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, withdrawTo, balance.toString()).then(() => {
             resolve(true);
           })
           .catch((e) => reject(e))
@@ -87,7 +93,7 @@ function GeneralInformation(props){
   }
 
   const callGetBalance = () => {
-    getAddressBalance(props?.contractDetails?.contractAddress).then((balance) => {
+    getAddressBalance(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork).then((balance) => {
       console.log('balance', balance.toString())
       setContractBalance(balance.toString() + " wei")
     })
@@ -105,11 +111,20 @@ function GeneralInformation(props){
   <div className='py-3'>
     <div className="col-12  my-3">
       <label htmlFor="contract-address" className="form-label">Enter WNFT contract address</label>
-      <div className="input-group">
-        
-        <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} onKeyDown={fetchContractKeyDown} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
+      <div className="d-flex flex-row">
+        <div className="col-8">
+          <input  type="text" className="form-control shadow-lg rounded" name="contract-address" id="contract-address" onChange={ContractAddressChange} onKeyDown={fetchContractKeyDown} value={contractAddressValue} placeholder="Example: 0xD17D95B20ef169459f55C5102463BC052340C463" />
+        </div>
+        <select onChange={ContractNetworkChange} value={contractNetworkValue}>
+          { [NO_SELECTED_NETWORK].concat(getSupportedChains()).map((networkName, i) => {     
+           // Return the element. Also pass key     
+           return (<option key={"network"+i}>{networkName}</option>) })
+          }
+        </select>
         <button  type="submit" className="btn btn-blue"  onClick={callFetchContract}>FETCH</button>
       </div>
+        
+      
       { props.isContractLoading && (<img src={loading_gif} />)}
       {isError &&  ((<GenericFieldSetError key="contract-address_error" errorMsg={isError} />)) }
 
@@ -139,7 +154,7 @@ function GeneralInformation(props){
     <GenericFieldSet key="wnft-transfer-key" genericFieldLabel="Transfer" buttonLabel="TRANSFER" genericFieldID="wnft-transfer" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callTransferWnft} initFieldValue="" validator={ethAddressValidate} />
 
 
-    {!notOwner && (<GenericFieldSet key="wnft-withdraw" genericFieldLabel="Withdraw" buttonLabel="WITHDRAW" genericFieldID="wnft-withdraw" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callWithdrawWnft} initFieldValue="" validator={ethAddressValidate} /> ) }
+    {!notOwner && (<GenericFieldSet key="wnft-withdraw" genericFieldLabel="Withdraw" buttonLabel="WITHDRAW" genericFieldID="wnft-withdraw" notOwnerAndNotLogin={notOwnerAndNotLogin} notOwner={notOwner}  callSet={callWithdrawWnft} initFieldValue="" validator={ethAddressValidate} resetValueAfterDone={true} /> ) }
 
     {!notOwner && (<div className="col-12  my-3">
     <button type="submit" data-tip={props.notOwnerAndNotLogin} disabled={props.notOwner ? 'disabled' : null} className="btn btn-secondary" onClick={callGetBalance}>Contract Balance</button> {contractBalance}

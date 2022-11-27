@@ -33,8 +33,10 @@ function GenericFieldSet(props){
         props.callSet(genericFieldValue)
         .then(() => {
           setIsLoading(false);
+          if(props.resetValueAfterDone) setGenericFieldValue(props.initFieldValue || '')
+          
         })
-        .catch((e) => {setIsLoading(false);setIsError(e)})
+        .catch((e) => {setIsLoading(false);setIsError(e);if(props.resetValueAfterDone) setGenericFieldValue(props.initFieldValue || '')})
     }
 
     const buttonLabel = props.buttonLabel || 'SET'

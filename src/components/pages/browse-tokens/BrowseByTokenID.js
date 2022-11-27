@@ -19,7 +19,7 @@ function BrowseByTokenID(props){
     const validator = intValidate(tokenIDValue)
     if (validator.valid) {
       setIsLoading(true);
-      getTokenByTokenID(props.contractDetails.contractAddress, tokenIDValue).then((resp) => { setTokenSearchResults( resp ); setIsLoading(false);})
+      getTokenByTokenID(props.contractDetails.contractAddress,  props.contractDetails.contractNetwork, tokenIDValue).then((resp) => { setTokenSearchResults( resp ); setIsLoading(false);})
     } 
     else setIsError(validator.msg)
   }

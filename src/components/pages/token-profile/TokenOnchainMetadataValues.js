@@ -11,8 +11,8 @@ function TokenOnchainMetadataValues(props){
         let promise = new Promise(function (resolve, reject) {
            // four functions to set token onchain metadata
            let setPromise
-           if(getTypeFromInterfactSignature(fieldInterface) === 'uint') setPromise = setTokenOnchainMetadataUint(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue);
-           else setPromise = setTokenOnchainMetadataString(props?.contractDetails?.contractAddress, props.tokenId, fieldName, tokenMetadataFieldValue)
+           if(getTypeFromInterfactSignature(fieldInterface) === 'uint') setPromise = setTokenOnchainMetadataUint(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, props.tokenId, fieldName, tokenMetadataFieldValue);
+           else setPromise = setTokenOnchainMetadataString(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, props.tokenId, fieldName, tokenMetadataFieldValue)
            setPromise.then(() => {resolve(true);})
            .catch((e) => reject(e))
         });

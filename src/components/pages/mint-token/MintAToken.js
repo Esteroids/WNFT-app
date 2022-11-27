@@ -31,7 +31,7 @@ function MintAToken(props){
         const validator = intValidate(tokenIDToMint)
         if (validator.valid){
             setIsLoading(true);
-            mintToken(props.contractDetails.contractAddress, tokenIDToMint, initTokenCID, withCID, props.contractDetails.mintPrice )
+            mintToken(props.contractDetails.contractAddress, props.contractDetails.contractNetwork, tokenIDToMint, initTokenCID, withCID, props.contractDetails.mintPrice )
             .then(() => {
                 setTokenIDToMint('');
                 setInitTokenCID('');

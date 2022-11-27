@@ -19,7 +19,7 @@ function BrowseByNthToken(props){
     const validator = intValidate(nthTokenValue)
     if (validator.valid) {
       setIsLoading(true);
-      getTokenByNthNum(props.contractDetails.contractAddress, nthTokenValue).then((resp) => { setTokenSearchResults( resp );setIsLoading(false);})
+      getTokenByNthNum(props.contractDetails.contractAddress, props.contractDetails.contractNetwork, nthTokenValue).then((resp) => { setTokenSearchResults( resp );setIsLoading(false);})
     }
     else setIsError(validator.msg)
   }

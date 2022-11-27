@@ -1,4 +1,3 @@
-
 const CHAIN_IDS = {
     mainnet: 1,
     ropsten: 3,
@@ -44,5 +43,7 @@ const getChainIdToDisplay = (chainId) => { return (CHAIN_NAMES[chainId] && capit
 
 const getNetChainIdHex = (net) => CHAIN_IDS[net.toLowerCase()] !== undefined && ("0x" + (CHAIN_IDS[net.toLowerCase()].toString(16)))
 
+const getSupportedChains = () => Object.keys(CHAIN_IDS).map(x => capitalizeWords(x));
 
-export {getRpcUrl, getWebSocketRpcUrl, getChainId, getChainIdToDisplay, getNetChainIdHex};
+
+export {getRpcUrl, getWebSocketRpcUrl, getChainId, getChainIdToDisplay, getNetChainIdHex, getSupportedChains};

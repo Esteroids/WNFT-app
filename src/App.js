@@ -60,8 +60,11 @@ function App(){
   const [userAddress, setUserAddress] = useState("");
 
   const contractURLAddress = searchParams.get('contract')
+  const contractURLNetwork = searchParams.get('network')
+
 
   const [contractAddress, setContractAddress] = useState(contractURLAddress)
+  const [contractNetwork, setContractNetwork] = useState(contractURLNetwork)
   const [contractDetails, setContractDetails] = useState({})
   const [error, setError] = useState("")
   const [isContractLoading, setIsContractLoading] = useState(false)
@@ -70,10 +73,10 @@ function App(){
 
 
   useEffect(() => {
-    if(contractAddress){
+    if(contractAddress&&contractNetwork){
       
       setIsContractLoading(true)
-      WnftContract(contractAddress).then((resp)=>{
+      WnftContract(contractAddress, contractNetwork).then((resp)=>{
         setIsContractLoading(false);
         setIsContractLoaded(true);
         setContractDetails(resp.contractDetails)
@@ -83,7 +86,7 @@ function App(){
           setIsContractLoading(false)
         })
       }
-  }, [contractAddress, userAddress])
+  }, [contractAddress, userAddress, contractNetwork])
   return (
 <main className="min-vh-100">
   <div className="container min-vh-100">
@@ -92,7 +95,7 @@ function App(){
       <Routes>
         <Route path="/" element={<ContractPageLayout />}>
          
-              <Route path="/" index  element={<GeneralInformation contractAddress={contractAddress} setContractAddress={setContractAddress} contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} isContractLoading={isContractLoading} />} />
+              <Route path="/" index  element={<GeneralInformation contractAddress={contractAddress} setContractAddress={setContractAddress} contractNetwork={contractNetwork} setContractNetwork={setContractNetwork} contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} isContractLoading={isContractLoading} />} />
               <Route path="/collection-onchain-metadata"  element={<CollectionOnchainMetadata contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded}  />} />
               <Route path="/token-onchain-metadata"  element={<TokenOnchainMetadata contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />} />
               <Route path="/ens-action"  element={<EnsAction contractDetails={contractDetails} setContractDetails={setContractDetails} isContractLoaded={isContractLoaded} />}  />

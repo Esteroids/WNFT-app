@@ -17,7 +17,7 @@ function TokenProfile(props){
   useEffect(() => {
     if(tokenId && props.contractDetails?.contractAddress){
       const withData = true;
-      getTokenByTokenID(props.contractDetails?.contractAddress, tokenId, withData, props.contractDetails.tokenOnchainMetadataDefenitions).then((resp)=>{
+      getTokenByTokenID(props.contractDetails?.contractAddress, props.contractDetails.contractNetwork, tokenId, withData, props.contractDetails.tokenOnchainMetadataDefenitions).then((resp)=>{
         setTokenDetails(resp)
       })
     }
@@ -28,7 +28,7 @@ function TokenProfile(props){
 
   const callSetTokenURI = (tokenURIValue) => {
     let promise = new Promise(function (resolve, reject) {
-      setTokenURI(props?.contractDetails?.contractAddress, tokenDetails.id, tokenURIValue)
+      setTokenURI(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, tokenDetails.id, tokenURIValue)
       .then(() => {setTokenDetails({...tokenDetails, tokenURI: tokenURIValue});resolve(true);})
       .catch((e) => reject(e))
     });
@@ -37,7 +37,7 @@ function TokenProfile(props){
 
   const callTransferTokenTo = (transferTokenTo) => {
     let promise = new Promise(function (resolve, reject) {
-      transferToken(props?.contractDetails?.contractAddress, transferTokenTo, tokenDetails.id)
+      transferToken(props?.contractDetails?.contractAddress, props.contractDetails.contractNetwork, transferTokenTo, tokenDetails.id)
       .then(() => {
         setTokenDetails({...tokenDetails, owner: transferTokenTo, isTokenOwner: false});
         resolve(true);

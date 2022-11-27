@@ -32,7 +32,7 @@ function TokenOnchainMetadata(props){
   const callSetTokenOnchainMetadataField = () => {
     if (props?.contractDetails?.contractAddress){
       setIsLoading(true);
-      setTokenOnchainMetadataField(props.contractDetails.contractAddress, fieldName, fieldSmartContractInterface, fieldSmartContractAddress)
+      setTokenOnchainMetadataField(props.contractDetails.contractAddress,  props.contractDetails.contractNetwork, fieldName, fieldSmartContractInterface, fieldSmartContractAddress)
       .then(() => {
         setFieldName('');
         setFieldSmartContractInterface('');

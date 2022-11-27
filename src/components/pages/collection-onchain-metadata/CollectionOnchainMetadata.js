@@ -28,7 +28,7 @@ function CollectionOnchainMetadata(props){
   const callSetCollectionOnchainMetadata = () => {
     if (props?.contractDetails?.contractAddress){
       setIsLoading(true);
-      setCollectionOnchainMetadata(props?.contractDetails?.contractAddress, fieldName, fieldValue)
+      setCollectionOnchainMetadata(props?.contractDetails?.contractAddress, props?.contractDetails?.contractNetwork, fieldName, fieldValue)
       .then(() => {
         setFieldName('');
         setFieldValue('');
